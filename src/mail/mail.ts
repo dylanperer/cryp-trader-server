@@ -1,63 +1,53 @@
-import { OAuth2Client } from "google-auth-library";
-const nodemailer = require("nodemailer");
-const { google } = require("googleapis");
+import { MailListener, IMailObject } from "mail-listener-typescript";
+import { LogType, MailActionType, ServerLog, ServerModuleType } from "../logger/Logger";
 
-const CLIENT_ID =
-  "362883414554-7hunsis61ulc4lt26l026sjetgttmc48.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
-const REDIRECT_URI = "https://developers.google.com/oauthplayground";
-const REFRESH_TOKEN =
-  "1//04u_NX2VCagghCgYIARAAGAQSNwF-L9IrdJUtsT2NCPcUNyLiUlid2FjKBsMRI3gS8_kx2lCkyPARDFzLTQEtustwOD6pQlYuqv0";
-
-const oAuth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI
-);
-
-oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-
-export const sendMail = async () => {
-  try {
-    const accessToken = await oAuth2Client.getAccessToken();
-
-    const transport = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: "cryp.trader01@gmail.com",
-        clientId: CLIENT_ID,
-        clientSecret: CLIENT_SECRET,
-        refreshToken: REFRESH_TOKEN,
-        accessToken: accessToken,
-      },
-    });
-
-    const mailOptions = {
-      from: "cryp-trader <cryp.trader01@gmail.com>",
-      to: "cryp.trader01@gmail.com",
-      subject: "api test",
-      text: "hello",
-    };
-
-    const result = await transport.sendMail(mailOptions);
-    return result;
-  } catch (err) {
-    return err;
-  }
+const options = {
+  username: "cryp.trader@outlook.com", // mail
+  password: "pUXMNb35y8IQa4Zs03GGhQMQpssR5wpv5Q5a", // pass
+  host: "outlook.office365.com", // host
+  port: 993, // imap port
+  tls: true, // tls
+  connTimeout: 10000, // Default by node-imap
+  authTimeout: 5000, // Default by node-imap,
+  debug: null, // Or your custom function with only one incoming argument. Default: null
+  tlsOptions: { rejectUnauthorized: false },
+  mailbox: "INBOX", // mailbox to monitor
+  searchFilter: ["NEW"], // the search filter being used after an IDLE notification has been retrieved
+  markSeen: false, // all fetched email will be marked as seen and not fetched next time
+  fetchUnreadOnStart: true, // use it only if you want to get all unread email on lib start. Default is `false`,
+  mailParserOptions: { streamAttachments: true }, // options to be passed to mailParser lib.
+  attachments: true, // get mail attachments as they are encountered
+  attachmentOptions: {
+    saveAttachments: false, // save attachments to the project directory
+    directory: "attachments/", // folder on project directory to save attachements, will be created if not exists
+    stream: true, // if it's enabled, will stream the attachments
+  },
 };
 
-// Listen for new email messages
-async function watchForNewEmails() {
-  const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
+const onMail = async (mail: IMailObject, seqno: any, attributes: any) => {
+  ServerLog(ServerModuleType.Mail, MailActionType.receiveMail, `${mail.subject}, ${mail.text}`);
+};
 
-  const res = await gmail.users.watch({
-    userId: "me",
-    resource: {
-      topicName: "YOUR_PUBSUB_TOPIC_NAME_HERE", // Replace this with the name of your Pub/Sub topic
-      labelIds: ["INBOX"],
-    },
-  });
+const onError = async (error: any) => {
+  ServerLog(ServerModuleType.Mail, MailActionType.error, `${error.toString()}, ${error.message}`, LogType.error);
+};
 
-  console.log(res.data);
-}
+export const addMailListener = async () => {
+  try{
+    const mailListener = new MailListener(options);
+
+    // Start
+    mailListener.start();
+
+    // Simple example of how to get all attachments from an email
+    mailListener.on("mail", onMail);
+
+    // Get erros
+    mailListener.on("error",onError);
+
+    ServerLog(ServerModuleType.Mail, MailActionType.attachListener, '', LogType.success);
+
+  }catch(error: any){
+    ServerLog(ServerModuleType.Mail, MailActionType.attachListener, `${error.toString()}, ${error.message}`, LogType.error);
+  }
+};
