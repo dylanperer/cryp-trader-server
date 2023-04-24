@@ -2,6 +2,7 @@ import chalk from "chalk";
 import moment from "moment";
 import * as fs from 'fs';
 import * as path from 'path';
+import {parse} from 'csv-parse';
 
 export enum ServerModuleType {
   Mail = "Mail",
@@ -40,6 +41,32 @@ const writeServerLogToCsv = (serverLog: IServerLog, filePath: string): void => {
   }
 };
 
+export const readServerLogFromCsv = async (filePath: string): Promise<IServerLog[]> => {
+  const serverLogs: IServerLog[] = [];
+
+  // Read the CSV file
+  const csvData = await fs.promises.readFile(filePath);
+
+  // Parse the CSV data
+  const records = await parse(csvData, {
+    columns: true,
+    skip_empty_lines: true,
+  });
+
+  // Convert each CSV record to an IServerLog object
+  for await (const record of records) {
+    const serverLog: IServerLog = {
+      module: record.module,
+      action: record.action,
+      context: record.context || undefined,
+      logLevel: record.logLevel || undefined,
+    };
+    serverLogs.push(serverLog);
+  }
+
+  return serverLogs;
+};
+
 export const ServerLog = (
   module: ServerModuleType,
   action: MailActionType,
@@ -50,7 +77,6 @@ export const ServerLog = (
     logLevel= LogType.info;
   }
   const formattedTime = moment(new Date()).format('DD/MM/YYYY h:mm:ss');
-  console.log('@> WRITTING TO FILE');
   
   const str = `${formattedTime} ${logLevel.toString()} ${module.toString()} ${action.toString()}${context?' | '.concat(context).concat('.'):'.'}`
   const _str = `> ${str}`;
