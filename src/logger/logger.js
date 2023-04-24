@@ -98,12 +98,33 @@ const writeServerLogToCsv = (serverLog, filePath) => {
     var _a, _b;
     const headerRow = "module,action,context,logLevel\n";
     const dataRow = `${serverLog.module},${serverLog.action},${(_a = serverLog.context) !== null && _a !== void 0 ? _a : ""},${(_b = serverLog.logLevel) !== null && _b !== void 0 ? _b : ""}\n`;
-    // If the file already exists, append the data to it; otherwise, create a new file.
     if (fs.existsSync(filePath)) {
+        // Check if the file has the necessary permissions
+        try {
+            fs.accessSync(filePath, fs.constants.W_OK | fs.constants.R_OK);
+        }
+        catch (error) {
+            // If file does not have the necessary permissions, try to modify the permissions
+            try {
+                fs.chmodSync(filePath, 0o666);
+            }
+            catch (error) {
+                console.error(`Unable to modify permissions for file ${filePath}`);
+                return;
+            }
+        }
+        // If the file already exists and has the necessary permissions, append the data to it
         fs.appendFileSync(filePath, dataRow);
     }
     else {
-        fs.writeFileSync(filePath, headerRow + dataRow);
+        // If the file does not exist, create a new file with the necessary permissions
+        try {
+            fs.writeFileSync(filePath, headerRow + dataRow, { mode: 0o666 });
+        }
+        catch (error) {
+            console.error(`Unable to create file ${filePath}`);
+            return;
+        }
     }
 };
 const readServerLogFromCsv = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
