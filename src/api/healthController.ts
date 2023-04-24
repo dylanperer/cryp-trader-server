@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", async (req, res) => {
-  const logs = await readServerLogFromCsv("temp1/log1.csv");
+  const logs = await readServerLogFromCsv("fuk.csv");
   res.send(logs);
 });
 
