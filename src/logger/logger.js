@@ -65,10 +65,39 @@ var LogType;
     LogType["error"] = "[Error]";
     LogType["success"] = "[Successful]";
 })(LogType = exports.LogType || (exports.LogType = {}));
+const createFolder = (cb) => {
+    const folderName = "temp";
+    // Check if the directory already exists
+    fs.stat(folderName, (err, stats) => {
+        if (err && err.code === "ENOENT") {
+            // If the directory does not exist, create it
+            fs.mkdir(folderName, (err) => {
+                if (err)
+                    throw err;
+                console.log("Directory created");
+                fs.chmod(folderName, 0o777, (err) => {
+                    if (err)
+                        throw err;
+                    console.log("Directory created with read and write permissions");
+                    cb();
+                });
+            });
+        }
+        else if (err) {
+            // If there was an error other than the directory not existing, throw it
+            throw err;
+        }
+        else {
+            // If the directory already exists, log a message
+            console.log("Directory already exists");
+            cb();
+        }
+    });
+};
 const writeServerLogToCsv = (serverLog, filePath) => {
     var _a, _b;
-    const headerRow = 'module,action,context,logLevel\n';
-    const dataRow = `${serverLog.module},${serverLog.action},${(_a = serverLog.context) !== null && _a !== void 0 ? _a : ''},${(_b = serverLog.logLevel) !== null && _b !== void 0 ? _b : ''}\n`;
+    const headerRow = "module,action,context,logLevel\n";
+    const dataRow = `${serverLog.module},${serverLog.action},${(_a = serverLog.context) !== null && _a !== void 0 ? _a : ""},${(_b = serverLog.logLevel) !== null && _b !== void 0 ? _b : ""}\n`;
     // If the file already exists, append the data to it; otherwise, create a new file.
     if (fs.existsSync(filePath)) {
         fs.appendFileSync(filePath, dataRow);
@@ -121,8 +150,8 @@ const ServerLog = (module, action, context, logLevel) => {
     if (!logLevel) {
         logLevel = LogType.info;
     }
-    const formattedTime = (0, moment_1.default)(new Date()).format('DD/MM/YYYY h:mm:ss');
-    const str = `${formattedTime} ${logLevel.toString()} ${module.toString()} ${action.toString()}${context ? ' | '.concat(context).concat('.') : '.'}`;
+    const formattedTime = (0, moment_1.default)(new Date()).format("DD/MM/YYYY h:mm:ss");
+    const str = `${formattedTime} ${logLevel.toString()} ${module.toString()} ${action.toString()}${context ? " | ".concat(context).concat(".") : "."}`;
     const _str = `> ${str}`;
     // const str = `> ${module.toString()}, ${action.toString()}${context?',':'.'} ${context} ${logLevel === LogType.success? '[Successful]': logLevel === LogType.error?'[Failed]': ''}`;
     switch (logLevel) {
@@ -135,14 +164,14 @@ const ServerLog = (module, action, context, logLevel) => {
             break;
         }
         case LogType.info: {
-            console.log(chalk_1.default.hex("#00ccff").bgHex('#0d0d0d').bold(_str));
+            console.log(chalk_1.default.hex("#00ccff").bgHex("#0d0d0d").bold(_str));
             break;
         }
         case LogType.success: {
-            console.log(chalk_1.default.hex("#66ff99").bgHex('#0d0d0d').bold(_str));
+            console.log(chalk_1.default.hex("#66ff99").bgHex("#0d0d0d").bold(_str));
             break;
         }
     }
-    writeServerLogToCsv({ module, action, context, logLevel }, 'log.csv');
+    createFolder(() => writeServerLogToCsv({ module, action, context, logLevel }, "temp/log.csv"));
 };
 exports.ServerLog = ServerLog;
