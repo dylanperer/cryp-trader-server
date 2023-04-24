@@ -1,5 +1,0 @@
-module,action,context,logLevel
-Mail,attach-listener,,[Successful]
-Mail,attach-listener,,[Successful]
-Mail,receive-mail,a, b
-,[Info]
