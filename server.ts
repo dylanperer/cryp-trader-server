@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { addMailListener } from "./mail/Mail";
+import { addMailListener } from "./src/mail/Mail";
 
 dotenv.config();
 
