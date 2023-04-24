@@ -1,5 +1,7 @@
 import chalk from "chalk";
 import moment from "moment";
+import * as fs from 'fs';
+import * as path from 'path';
 
 export enum ServerModuleType {
   Mail = "Mail",
@@ -19,6 +21,25 @@ export enum LogType {
   success = '[Successful]',
 }
 
+export interface IServerLog{
+  module: ServerModuleType,
+  action: MailActionType,
+  context?: string,
+  logLevel?: LogType
+}
+
+const writeServerLogToCsv = (serverLog: IServerLog, filePath: string): void => {
+  const headerRow = 'module,action,context,logLevel\n';
+  const dataRow = `${serverLog.module},${serverLog.action},${serverLog.context ?? ''},${serverLog.logLevel ?? ''}\n`;
+
+  // If the file already exists, append the data to it; otherwise, create a new file.
+  if (fs.existsSync(filePath)) {
+    fs.appendFileSync(filePath, dataRow);
+  } else {
+    fs.writeFileSync(filePath, headerRow + dataRow);
+  }
+};
+
 export const ServerLog = (
   module: ServerModuleType,
   action: MailActionType,
@@ -29,6 +50,7 @@ export const ServerLog = (
     logLevel= LogType.info;
   }
   const formattedTime = moment(new Date()).format('DD/MM/YYYY h:mm:ss');
+  console.log('@> WRITTING TO FILE');
   
   const str = `${formattedTime} ${logLevel.toString()} ${module.toString()} ${action.toString()}${context?' | '.concat(context).concat('.'):'.'}`
   const _str = `> ${str}`;
@@ -53,4 +75,7 @@ export const ServerLog = (
       break;
     }
   }
+
+  writeServerLogToCsv({module, action, context, logLevel}, 'log.csv');
+
 };

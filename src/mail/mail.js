@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addMailListener = void 0;
 const mail_listener_typescript_1 = require("mail-listener-typescript");
-const logger_1 = require("../logger");
+const logger_1 = require("../logger/logger");
 const options = {
     host: "outlook.office365.com",
     port: 993,
