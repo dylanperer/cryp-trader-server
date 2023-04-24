@@ -66,7 +66,7 @@ var LogType;
     LogType["success"] = "[Successful]";
 })(LogType = exports.LogType || (exports.LogType = {}));
 const createFolder = (cb) => {
-    const folderName = "temp";
+    const folderName = "temp1";
     // Check if the directory already exists
     fs.stat(folderName, (err, stats) => {
         if (err && err.code === "ENOENT") {
@@ -110,7 +110,6 @@ const writeServerLogToCsv = (serverLog, filePath) => {
             }
             catch (error) {
                 console.error(`Unable to modify permissions for file ${filePath}`);
-                return;
             }
         }
         // If the file already exists and has the necessary permissions, append the data to it
@@ -193,6 +192,6 @@ const ServerLog = (module, action, context, logLevel) => {
             break;
         }
     }
-    createFolder(() => writeServerLogToCsv({ module, action, context, logLevel }, "temp/log.csv"));
+    createFolder(() => writeServerLogToCsv({ module, action, context, logLevel }, "temp1/log1.csv"));
 };
 exports.ServerLog = ServerLog;

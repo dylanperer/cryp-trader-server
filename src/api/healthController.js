@@ -30,7 +30,7 @@ app.use((req, res, next) => {
     next();
 });
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const logs = yield (0, logger_1.readServerLogFromCsv)("temp/log.csv");
+    const logs = yield (0, logger_1.readServerLogFromCsv)("temp1/log1.csv");
     res.send(logs);
 }));
 const startExpress = (logs) => {
