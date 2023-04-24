@@ -143,6 +143,5 @@ const ServerLog = (module, action, context, logLevel) => {
             break;
         }
     }
-    writeServerLogToCsv({ module, action, context, logLevel }, 'fuk.csv');
 };
 exports.ServerLog = ServerLog;

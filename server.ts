@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
-import { startExpress } from "./api/healthController";
-import { addMailListener } from "./mail/mail";
+import { startExpress } from "./src/api/healthController";
+import { addMailListener } from "./src/mail";
 import {
   IServerLog,
   MailActionType,
   ServerModuleType,
   LogType,
-} from "./logger/logger";
+} from "./src/logger";
 import * as fs from "fs";
 
 dotenv.config();

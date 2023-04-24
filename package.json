@@ -2,9 +2,9 @@
   "name": "cryp-trader-server",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "tsc && node src/server.js"
+    "dev": "tsc && node server.js"
   },
   "keywords": [],
   "author": "",

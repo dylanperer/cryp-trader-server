@@ -16,7 +16,6 @@ exports.startExpress = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const ws_1 = __importDefault(require("ws"));
-const logger_1 = require("../logger/logger");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const websocketServer = new ws_1.default.Server({ server: server });
@@ -30,8 +29,7 @@ app.use((req, res, next) => {
     next();
 });
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const logs = yield (0, logger_1.readServerLogFromCsv)("fuk.csv");
-    res.send(logs);
+    res.send('logs');
 }));
 const startExpress = (logs) => {
     app.listen(3000, () => {

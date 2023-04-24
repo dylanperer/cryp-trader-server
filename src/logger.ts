@@ -102,6 +102,5 @@ export const ServerLog = (
     }
   }
 
-  writeServerLogToCsv({module, action, context, logLevel}, 'fuk.csv');
 
 };

@@ -7,7 +7,7 @@ import {
   MailActionType,
   LogType,
   readServerLogFromCsv,
-} from "../logger/logger";
+} from "../logger";
 
 const app = express();
 const server = http.createServer(app);
@@ -30,8 +30,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", async (req, res) => {
-  const logs = await readServerLogFromCsv("fuk.csv");
-  res.send(logs);
+  res.send('logs');
 });
 
 export const startExpress = (logs: Array<IServerLog>) => {
