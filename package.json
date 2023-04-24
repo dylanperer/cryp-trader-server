@@ -2,7 +2,7 @@
   "name": "cryp-trader-server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
     "preview": "tsc && node src/server.js"
