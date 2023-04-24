@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ext": ".ts,.tsx",
   "ignore": ["node_modules"],
-  "exec": "ts-node-esm server.ts"
+  "exec": "ts-node-esm src/server.ts"
 }

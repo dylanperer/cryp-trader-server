@@ -1,5 +1,5 @@
 import { MailListener, IMailObject } from "mail-listener-typescript";
-import { LogType, MailActionType, ServerLog, ServerModuleType } from "../logger";
+import { ServerLog, ServerModuleType, MailActionType, LogType } from "../logger.js";
 
 
 const options = {
