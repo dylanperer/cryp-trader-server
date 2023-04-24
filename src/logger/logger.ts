@@ -29,7 +29,7 @@ export interface IServerLog {
   logLevel?: LogType;
 }
 const createFolder = (cb: () => void) => {
-  const folderName = "temp";
+  const folderName = "temp1";
 
   // Check if the directory already exists
   fs.stat(folderName, (err, stats) => {
@@ -154,6 +154,6 @@ export const ServerLog = (
   }
 
   createFolder(() =>
-    writeServerLogToCsv({ module, action, context, logLevel }, "temp/log.csv")
+    writeServerLogToCsv({ module, action, context, logLevel }, "temp1/log1.csv")
   );
 };
