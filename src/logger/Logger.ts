@@ -1,8 +1,8 @@
 import chalk from "chalk";
 
 export enum ServerModuleType {
-  Mail = "MAIL",
-  Binance = "BINANCE",
+  Mail = "Mail",
+  Binance = "Binance",
 }
 
 export enum MailActionType {
@@ -25,16 +25,26 @@ export const ServerLog = (
   logLevel?: LogType
 ) => {
   if (!logLevel) {
+    logLevel= LogType.info;
   }
-  const str = `> ${module.toString()}, ${action.toString()} `;
+  const str = `> ${module.toString()}, ${action.toString()}, ${context}`;
 
   switch (logLevel) {
     case LogType.error: {
-      console.log(chalk.hex("#e4f").bold(str));
+      console.log(chalk.hex("#ff471a").bold(str));
       break;
     }
-    default: {
-      console.log(chalk.hex("#fff").bgHex('#ff9900').bold(str));
+    case LogType.warn: {
+      console.log(chalk.hex("#ff8533").bold(str));
+      break;
+    }
+    case LogType.info: {
+      console.log(chalk.hex("#00ccff").bgHex('#0d0d0d').bold(str));
+      break;
+    }
+    case LogType.success: {
+      console.log(chalk.hex("#66ff99").bgHex('#0d0d0d').bold(str));
+      break;
     }
   }
 };
