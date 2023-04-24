@@ -73,7 +73,6 @@ const writeServerLogToCsv = (serverLog: IServerLog, filePath: string): void => {
         fs.chmodSync(filePath, 0o666);
       } catch (error) {
         console.error(`Unable to modify permissions for file ${filePath}`);
-        return;
       }
     }
     // If the file already exists and has the necessary permissions, append the data to it
