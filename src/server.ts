@@ -1,3 +1,9 @@
+import dotenv from "dotenv";
 import { addMailListener } from "./mail/Mail";
 
-addMailListener();
+dotenv.config();
+
+addMailListener(
+  process.env.EMAIL_ADDRESS || "",
+  process.env.EMAIL_PASSWORD || ""
+);

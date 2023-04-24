@@ -1,9 +1,8 @@
 import { MailListener, IMailObject } from "mail-listener-typescript";
-import { LogType, MailActionType, ServerLog, ServerModuleType } from "../logger/Logger";
+import { ServerLog, ServerModuleType, MailActionType, LogType } from "../Logger";
+
 
 const options = {
-  username: "cryp.trader@outlook.com", // mail
-  password: "pUXMNb35y8IQa4Zs03GGhQMQpssR5wpv5Q5a", // pass
   host: "outlook.office365.com", // host
   port: 993, // imap port
   tls: true, // tls
@@ -32,9 +31,9 @@ const onError = async (error: any) => {
   ServerLog(ServerModuleType.Mail, MailActionType.error, `${error.toString()}, ${error.message}`, LogType.error);
 };
 
-export const addMailListener = async () => {
+export const addMailListener = async (email: string, password: string) => {
   try{
-    const mailListener = new MailListener(options);
+    const mailListener = new MailListener({...options, username: email, password:password});
 
     // Start
     mailListener.start();

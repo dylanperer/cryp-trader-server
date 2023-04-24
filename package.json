@@ -13,11 +13,13 @@
   "dependencies": {
     "@types/node": "^18.15.13",
     "chalk": "4.1.2",
+    "dotenv": "^16.0.3",
     "google-auth-library": "^8.7.0",
     "googleapis": "^118.0.0",
     "imap": "^0.8.19",
     "mail-listener-typescript": "^1.0.18",
     "mail-listener5": "^2.1.2",
+    "moment": "^2.29.4",
     "nodemailer": "^6.9.1",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
