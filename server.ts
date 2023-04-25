@@ -4,6 +4,7 @@ import { addMailListener } from "./src/mail";
 import { serverError, ModuleType, ActionType, serverInfo } from './src/logger';
 import { connectDatabase } from "./src/database/mongoose";
 import moment from "moment";
+import { TradeModel } from "./src/database/models/trade";
 
 dotenv.config();
 
@@ -14,9 +15,18 @@ const startServer = async() => {
     startExpress();
 
     addMailListener();
-    // setInterval(()=>{
-    //   serverInfo(ModuleType.Server, ActionType.serverStart, moment().toLocaleString());
-    // }, 1000)
+    
+    await TradeModel.deleteMany({});
+
+    setInterval(async ()=>{
+       const res = await TradeModel.insertMany([
+        {
+          tradeEvent: moment().toLocaleString(),
+          entryPrice: 0.00
+        },
+      ]);
+      console.log('Inserted', res)
+    }, 2000)
     
   } catch (error:any) {
     serverError(ModuleType.Server, ActionType.serverStart, `${error.message}`)    

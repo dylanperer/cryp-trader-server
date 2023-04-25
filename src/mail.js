@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.addMailListener = void 0;
 //@ts-ignore
 const mail_listener5_1 = require("mail-listener5");
-const trade_1 = require("./database/models/trade");
 const logger_1 = require("./logger");
 const options = {
     username: "imap-username",
@@ -33,12 +32,6 @@ const options = {
 };
 const onMail = (mail, seqno, attributes) => __awaiter(void 0, void 0, void 0, function* () {
     (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${mail.subject}, ${mail.text}`);
-    const _res = yield trade_1.TradeModel.insertMany([
-        {
-            tradeEvent: mail.subject,
-            entryPrice: 0.00
-        },
-    ]);
 });
 const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
     (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.mailError, `${error.toString()}, ${error.message}`);

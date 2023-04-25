@@ -17,15 +17,24 @@ const healthController_1 = require("./src/api/healthController");
 const mail_1 = require("./src/mail");
 const logger_1 = require("./src/logger");
 const mongoose_1 = require("./src/database/mongoose");
+const moment_1 = __importDefault(require("moment"));
+const trade_1 = require("./src/database/models/trade");
 dotenv_1.default.config();
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, mongoose_1.connectDatabase)();
         (0, healthController_1.startExpress)();
         (0, mail_1.addMailListener)();
-        // setInterval(()=>{
-        //   serverInfo(ModuleType.Server, ActionType.serverStart, moment().toLocaleString());
-        // }, 1000)
+        yield trade_1.TradeModel.deleteMany({});
+        setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield trade_1.TradeModel.insertMany([
+                {
+                    tradeEvent: (0, moment_1.default)().toLocaleString(),
+                    entryPrice: 0.00
+                },
+            ]);
+            console.log('Inserted', res);
+        }), 1000);
     }
     catch (error) {
         (0, logger_1.serverError)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${error.message}`);
