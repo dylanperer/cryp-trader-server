@@ -3,13 +3,14 @@ import moment from "moment";
 import * as fs from "fs";
 import * as path from "path";
 import { parse } from "csv-parse";
+import { prisma } from "../prisma/prisma";
 
 export enum ModuleType {
   Mail = "Mail",
   Binance = "Binance",
   Server = "Server",
-  Api = 'Api',
-  Database = 'Database',
+  Api = "Api",
+  Database = "Database",
 }
 
 export enum ActionType {
@@ -22,7 +23,7 @@ export enum ActionType {
 
   apiStarted = "start-api",
   apiError = "api-error",
-  apiEndpoint = 'api-endpoint',
+  apiEndpoint = "api-endpoint",
 
   connectDatabase = "connect-database",
   databaseError = "database-error",
@@ -122,7 +123,20 @@ const buildLogStr = (
 ) => {
   const formattedTime = moment(new Date()).format("DD/MM/YYYY h:mm:ss");
 
-  const str = `${formattedTime} [${module.toString()}] [${action.toString()}] ${context?context.concat('.'):''}`;
+  const str = `${formattedTime} [${module.toString()}] [${action.toString()}] ${
+    context ? context.concat(".") : ""
+  }`;
+
+  prisma.log
+    .create({
+      data: {
+        module: module.toString(),
+        action: action.toString(),
+        logLevel: logLevel?.toString() || LogType.info.toString(),
+        context,
+      },
+    })
+    .then((res) => console.log(res));
 
   return str;
 };

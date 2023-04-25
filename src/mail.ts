@@ -1,5 +1,6 @@
 //@ts-ignore
-import {MailListener} from 'mail-listener5';
+import { MailListener } from "mail-listener5";
+import moment from "moment";
 
 import {
   LogType,
@@ -19,21 +20,35 @@ const options = {
   connTimeout: 10000, // Default by node-imap
   authTimeout: 5000, // Default by node-imap,
   debug: null, // Or your custom function with only one incoming argument. Default: null
-  autotls: 'never', // default by node-imap
+  autotls: "never", // default by node-imap
   tlsOptions: { rejectUnauthorized: false },
   mailbox: "INBOX", // mailbox to monitor
   searchFilter: ["ALL"], // the search filter being used after an IDLE notification has been retrieved
   markSeen: true, // all fetched email willbe marked as seen and not fetched next time
-  fetchUnreadOnStart: false, // use it only if you want to get all unread email on lib start. Default is `false`,
+  fetchUnreadOnStart: true, // use it only if you want to get all unread email on lib start. Default is `false`,
   attachments: false, // download attachments as they are encountered to the project directory
 };
 
-const onMail = async (mail: any, seqno: any, attributes: any) => {
-  serverInfo(
-    ModuleType.Mail,
-    ActionType.onReceiveMail,
-    `${mail.subject}, ${mail.text}`
+const onMail = async (
+  mail: any,
+  seqno: any,
+  attributes: any,
+  startTime: Date,
+  seenUIDs: Array<{ uid: number; subject: string }>
+) => {
+  const find = seenUIDs.find(
+    (c) => c.subject === mail.subject && c.uid === attributes.uid
   );
+
+  if (!find && mail.date > startTime) {
+    seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
+    serverInfo(
+      ModuleType.Mail,
+      ActionType.onReceiveMail,
+      `${mail.subject}`
+    );
+    
+  }
 };
 
 const onError = async (error: any) => {
@@ -53,24 +68,27 @@ export const addMailListener = async () => {
     if (!email || !password) {
       throw new Error(`Invalid email or password`);
     }
+
+    const startTime = moment();
+    const seenUIDs: Array<{ uid: number; subject: string }> = [];
+
     const mailListener = new MailListener({
       ...options,
       username: email,
       password: password,
     });
 
-
     // Start
     mailListener.start();
 
-     // Get errors
-     mailListener.on("error", onError);
+    // Get errors
+    mailListener.on("error", onError);
 
     mailListener.on("server:connected", () => {
-
-      mailListener.on("mail", onMail);
+      mailListener.on("mail", (mail: any, seqno: any, attributes: any) => {
+        onMail(mail, seqno, attributes, startTime.toDate(), seenUIDs);
+      });
       serverSuccess(ModuleType.Mail, ActionType.addMailListener);
-
     });
 
     // Simple example of how to get all attachments from an email

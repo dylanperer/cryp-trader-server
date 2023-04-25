@@ -17,3 +17,12 @@ model Trade {
   exitPrice  Float?
   createdAt  DateTime @default(now())
 }
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  module    String
+  action    String
+  logLevel  String
+  context   String?
+}

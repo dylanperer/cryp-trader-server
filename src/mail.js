@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addMailListener = void 0;
 //@ts-ignore
 const mail_listener5_1 = require("mail-listener5");
+const moment_1 = __importDefault(require("moment"));
 const logger_1 = require("./logger");
 const options = {
     username: "imap-username",
@@ -22,16 +26,20 @@ const options = {
     connTimeout: 10000,
     authTimeout: 5000,
     debug: null,
-    autotls: 'never',
+    autotls: "never",
     tlsOptions: { rejectUnauthorized: false },
     mailbox: "INBOX",
     searchFilter: ["ALL"],
     markSeen: true,
-    fetchUnreadOnStart: false,
+    fetchUnreadOnStart: true,
     attachments: false, // download attachments as they are encountered to the project directory
 };
-const onMail = (mail, seqno, attributes) => __awaiter(void 0, void 0, void 0, function* () {
-    (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${mail.subject}, ${mail.text}`);
+const onMail = (mail, seqno, attributes, startTime, seenUIDs) => __awaiter(void 0, void 0, void 0, function* () {
+    const find = seenUIDs.find((c) => c.subject === mail.subject && c.uid === attributes.uid);
+    if (!find && mail.date > startTime) {
+        seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
+        (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${mail.subject}`);
+    }
 });
 const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
     (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.mailError, `${error.toString()}, ${error.message}`);
@@ -44,13 +52,17 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!email || !password) {
             throw new Error(`Invalid email or password`);
         }
+        const startTime = (0, moment_1.default)();
+        const seenUIDs = [];
         const mailListener = new mail_listener5_1.MailListener(Object.assign(Object.assign({}, options), { username: email, password: password }));
         // Start
         mailListener.start();
         // Get errors
         mailListener.on("error", onError);
         mailListener.on("server:connected", () => {
-            mailListener.on("mail", onMail);
+            mailListener.on("mail", (mail, seqno, attributes) => {
+                onMail(mail, seqno, attributes, startTime.toDate(), seenUIDs);
+            });
             (0, logger_1.serverSuccess)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener);
         });
         // Simple example of how to get all attachments from an email
