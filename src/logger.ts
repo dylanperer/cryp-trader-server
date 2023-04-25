@@ -136,7 +136,7 @@ const buildLogStr = (
         context,
       },
     })
-    .then((res) => console.log(res));
+    .then((res) => console.log('log inserted.'));
 
   return str;
 };

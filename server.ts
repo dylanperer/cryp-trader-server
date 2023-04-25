@@ -13,9 +13,6 @@ const startServer = async() => {
 
     addMailListener();
 
-    const trade = await prisma.trade.create({data: {side: 'sell', entryPrice: 10, exitPrice: 0}});
-    console.log(trade);
-
   } catch (error:any) {
     serverError(ModuleType.Server, ActionType.serverStart, `${error.message}`)    
   }
