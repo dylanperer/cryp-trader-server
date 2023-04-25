@@ -13,10 +13,10 @@ const startServer = async() => {
 
     startExpress();
 
-    // addMailListener();
-    setInterval(()=>{
-      serverInfo(ModuleType.Server, ActionType.serverStart, moment().toLocaleString());
-    }, 1000)
+    addMailListener();
+    // setInterval(()=>{
+    //   serverInfo(ModuleType.Server, ActionType.serverStart, moment().toLocaleString());
+    // }, 1000)
     
   } catch (error:any) {
     serverError(ModuleType.Server, ActionType.serverStart, `${error.message}`)    
