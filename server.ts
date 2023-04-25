@@ -1,29 +1,23 @@
 import dotenv from "dotenv";
 import { startExpress } from "./src/api/healthController";
 import { addMailListener } from "./src/mail";
-import {
-  IServerLog,
-  MailActionType,
-  ServerModuleType,
-  LogType,
-} from "./src/logger";
-import * as fs from "fs";
+import { serverError, ModuleType, ActionType } from './src/logger';
+import { connectDatabase } from "./src/database/mongoose";
 
 dotenv.config();
 
-const CURRENT_LOGS: Array<IServerLog> = [
-  {
-    module: ServerModuleType.Mail,
-    action: MailActionType.attachListener,
-    context: "",
-    logLevel: LogType.success,
-  },
-];
+const startServer = async() => {
+  try {
+    await connectDatabase();
 
+    startExpress();
 
-startExpress(CURRENT_LOGS);
+    addMailListener();
+    
+  } catch (error:any) {
+    serverError(ModuleType.Server, ActionType.serverStart, `${error.message}`)    
+  }
 
-addMailListener(
-  process.env.EMAIL_ADDRESS || "",
-  process.env.EMAIL_PASSWORD || ""
-);
+};
+
+startServer();

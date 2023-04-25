@@ -12,20 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv_1 = __importDefault(require("dotenv"));
-const healthController_1 = require("./src/api/healthController");
-const mail_1 = require("./src/mail");
-const logger_1 = require("./src/logger");
-const mongoose_1 = require("./src/database/mongoose");
-dotenv_1.default.config();
-const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.connectDatabase = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
+const logger_1 = require("../logger");
+const connectDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
+    const connectionUri = process.env.DB_URI;
     try {
-        yield (0, mongoose_1.connectDatabase)();
-        (0, healthController_1.startExpress)();
-        (0, mail_1.addMailListener)();
+        if (!connectionUri)
+            throw new Error(`Invalid database connect uri`);
+        const conn = yield mongoose_1.default.connect(connectionUri);
+        (0, logger_1.serverSuccess)(logger_1.ModuleType.Database, logger_1.ActionType.connectDatabase);
     }
     catch (error) {
-        (0, logger_1.serverError)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${error.message}`);
+        (0, logger_1.serverError)(logger_1.ModuleType.Database, logger_1.ActionType.connectDatabase, error.message);
     }
 });
-startServer();
+exports.connectDatabase = connectDatabase;

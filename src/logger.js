@@ -42,22 +42,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServerLog = exports.readServerLogFromCsv = exports.LogType = exports.MailActionType = exports.ServerModuleType = void 0;
+exports.serverSuccess = exports.serverWarn = exports.serverInfo = exports.serverError = exports.readServerLogFromCsv = exports.LogType = exports.ActionType = exports.ModuleType = void 0;
 const chalk_1 = __importDefault(require("chalk"));
 const moment_1 = __importDefault(require("moment"));
 const fs = __importStar(require("fs"));
 const csv_parse_1 = require("csv-parse");
-var ServerModuleType;
-(function (ServerModuleType) {
-    ServerModuleType["Mail"] = "Mail";
-    ServerModuleType["Binance"] = "Binance";
-})(ServerModuleType = exports.ServerModuleType || (exports.ServerModuleType = {}));
-var MailActionType;
-(function (MailActionType) {
-    MailActionType["attachListener"] = "attach-listener";
-    MailActionType["receiveMail"] = "receive-mail";
-    MailActionType["error"] = "mail-error";
-})(MailActionType = exports.MailActionType || (exports.MailActionType = {}));
+var ModuleType;
+(function (ModuleType) {
+    ModuleType["Mail"] = "Mail";
+    ModuleType["Binance"] = "Binance";
+    ModuleType["Server"] = "Server";
+    ModuleType["Api"] = "Api";
+    ModuleType["Database"] = "Database";
+})(ModuleType = exports.ModuleType || (exports.ModuleType = {}));
+var ActionType;
+(function (ActionType) {
+    ActionType["addMailListener"] = "add-mail-listener";
+    ActionType["onReceiveMail"] = "on-receive-mail";
+    ActionType["mailError"] = "mail-error";
+    ActionType["serverStart"] = "server-start";
+    ActionType["serverError"] = "server-error";
+    ActionType["apiStarted"] = "api-start";
+    ActionType["apiError"] = "api-error";
+    ActionType["apiEndpoint"] = "api-endpoint";
+    ActionType["connectDatabase"] = "connect-database";
+    ActionType["databaseError"] = "database-error";
+})(ActionType = exports.ActionType || (exports.ActionType = {}));
 var LogType;
 (function (LogType) {
     LogType["info"] = "[Info]";
@@ -67,8 +77,8 @@ var LogType;
 })(LogType = exports.LogType || (exports.LogType = {}));
 const writeServerLogToCsv = (serverLog, filePath) => {
     var _a, _b;
-    const headerRow = 'module,action,context,logLevel\n';
-    const dataRow = `${serverLog.module},${serverLog.action},${(_a = serverLog.context) !== null && _a !== void 0 ? _a : ''},${(_b = serverLog.logLevel) !== null && _b !== void 0 ? _b : ''}\n`;
+    const headerRow = "module,action,context,logLevel\n";
+    const dataRow = `${serverLog.module},${serverLog.action},${(_a = serverLog.context) !== null && _a !== void 0 ? _a : ""},${(_b = serverLog.logLevel) !== null && _b !== void 0 ? _b : ""}\n`;
     // If the file already exists, append the data to it; otherwise, create a new file.
     if (fs.existsSync(filePath)) {
         fs.appendFileSync(filePath, dataRow);
@@ -117,14 +127,9 @@ const readServerLogFromCsv = (filePath) => __awaiter(void 0, void 0, void 0, fun
     return serverLogs;
 });
 exports.readServerLogFromCsv = readServerLogFromCsv;
-const ServerLog = (module, action, context, logLevel) => {
-    if (!logLevel) {
-        logLevel = LogType.info;
-    }
-    const formattedTime = (0, moment_1.default)(new Date()).format('DD/MM/YYYY h:mm:ss');
-    const str = `${formattedTime} ${logLevel.toString()} ${module.toString()} ${action.toString()}${context ? ' | '.concat(context).concat('.') : '.'}`;
+const Log = (module, action, context, logLevel) => {
+    const str = buildLogStr(module, action, logLevel, context);
     const _str = `> ${str}`;
-    // const str = `> ${module.toString()}, ${action.toString()}${context?',':'.'} ${context} ${logLevel === LogType.success? '[Successful]': logLevel === LogType.error?'[Failed]': ''}`;
     switch (logLevel) {
         case LogType.error: {
             console.log(chalk_1.default.hex("#ff471a").bold(_str));
@@ -135,13 +140,33 @@ const ServerLog = (module, action, context, logLevel) => {
             break;
         }
         case LogType.info: {
-            console.log(chalk_1.default.hex("#00ccff").bgHex('#0d0d0d').bold(_str));
+            console.log(chalk_1.default.hex("#00ccff").bgHex("#0d0d0d").bold(_str));
             break;
         }
         case LogType.success: {
-            console.log(chalk_1.default.hex("#66ff99").bgHex('#0d0d0d').bold(_str));
+            console.log(chalk_1.default.hex("#66ff99").bgHex("#0d0d0d").bold(_str));
             break;
         }
     }
 };
-exports.ServerLog = ServerLog;
+const buildLogStr = (module, action, logLevel, context) => {
+    const formattedTime = (0, moment_1.default)(new Date()).format("DD/MM/YYYY h:mm:ss");
+    const str = `${formattedTime} ${logLevel === null || logLevel === void 0 ? void 0 : logLevel.toString()} [${module.toString()}] [${action.toString()}] ${context ? context.concat('.') : ''}`;
+    return str;
+};
+const serverError = (module, action, context) => {
+    Log(module, action, context, LogType.error);
+};
+exports.serverError = serverError;
+const serverInfo = (module, action, context) => {
+    Log(module, action, context, LogType.info);
+};
+exports.serverInfo = serverInfo;
+const serverWarn = (module, action, context) => {
+    Log(module, action, context, LogType.warn);
+};
+exports.serverWarn = serverWarn;
+const serverSuccess = (module, action, context) => {
+    Log(module, action, context, LogType.success);
+};
+exports.serverSuccess = serverSuccess;

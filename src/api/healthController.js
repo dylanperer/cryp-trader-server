@@ -16,6 +16,9 @@ exports.startExpress = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const ws_1 = __importDefault(require("ws"));
+const logger_1 = require("../logger");
+const trade_1 = require("../database/models/trade");
+const logger_2 = require("../logger");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const websocketServer = new ws_1.default.Server({ server: server });
@@ -29,11 +32,27 @@ app.use((req, res, next) => {
     next();
 });
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send('logs');
+    try {
+        const _res = yield trade_1.TradeModel.insertMany([
+            {
+                tradeEvent: 'Buy',
+                entryPrice: 10.99
+            },
+            {
+                tradeEvent: 'Sell',
+                entryPrice: 12.34
+            }
+        ]);
+        res.send(_res);
+    }
+    catch (error) {
+        (0, logger_1.serverError)(logger_2.ModuleType.Api, logger_2.ActionType.apiEndpoint, '/');
+    }
 }));
-const startExpress = (logs) => {
-    app.listen(3000, () => {
-        console.log("Server listening on port 3000");
+const startExpress = () => {
+    const port = process.env.PORT;
+    app.listen(port, () => {
+        (0, logger_1.serverSuccess)(logger_2.ModuleType.Api, logger_2.ActionType.apiStarted, `Port:${port}`);
     });
 };
 exports.startExpress = startExpress;

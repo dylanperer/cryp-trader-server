@@ -1,10 +1,14 @@
 import express from "express";
 import http from "http";
 import WebSocket from "ws";
+import { serverSuccess, serverError } from '../logger';
+import { TradeModel } from '../database/models/trade';
+
+
 import {
   IServerLog,
-  ServerModuleType,
-  MailActionType,
+  ModuleType,
+  ActionType,
   LogType,
   readServerLogFromCsv,
 } from "../logger";
@@ -30,11 +34,26 @@ app.use((req, res, next) => {
 });
 
 app.get("/", async (req, res) => {
-  res.send('logs');
+  try {
+    const _res = await TradeModel.insertMany([
+      {
+        tradeEvent: 'Buy',
+        entryPrice: 10.99
+      },
+      {
+        tradeEvent: 'Sell',
+        entryPrice: 12.34
+      }
+    ]);
+    res.send(_res)
+  } catch (error) {
+    serverError(ModuleType.Api, ActionType.apiEndpoint, '/');
+  }
 });
 
-export const startExpress = (logs: Array<IServerLog>) => {
-  app.listen(3000, () => {
-    console.log("Server listening on port 3000");
+export const startExpress = () => {
+  const port = process.env.PORT;
+  app.listen(port, () => {
+    serverSuccess(ModuleType.Api, ActionType.apiStarted, `Port:${port}`);
   });
 };

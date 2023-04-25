@@ -33,13 +33,18 @@ const options = {
     },
 };
 const onMail = (mail, seqno, attributes) => __awaiter(void 0, void 0, void 0, function* () {
-    (0, logger_1.ServerLog)(logger_1.ServerModuleType.Mail, logger_1.MailActionType.receiveMail, `${mail.subject}, ${mail.text}`);
+    (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${mail.subject}, ${mail.text}`);
 });
 const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
-    (0, logger_1.ServerLog)(logger_1.ServerModuleType.Mail, logger_1.MailActionType.error, `${error.toString()}, ${error.message}`, logger_1.LogType.error);
+    (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.mailError, `${error.toString()}, ${error.message}`);
 });
-const addMailListener = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
+    const email = process.env.EMAIL_ADDRESS;
+    const password = process.env.EMAIL_PASSWORD;
     try {
+        if (!email || !password) {
+            throw new Error(`Invalid email or password`);
+        }
         const mailListener = new mail_listener_typescript_1.MailListener(Object.assign(Object.assign({}, options), { username: email, password: password }));
         // Start
         mailListener.start();
@@ -47,10 +52,10 @@ const addMailListener = (email, password) => __awaiter(void 0, void 0, void 0, f
         mailListener.on("mail", onMail);
         // Get erros
         mailListener.on("error", onError);
-        (0, logger_1.ServerLog)(logger_1.ServerModuleType.Mail, logger_1.MailActionType.attachListener, '', logger_1.LogType.success);
+        (0, logger_1.serverSuccess)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener);
     }
     catch (error) {
-        (0, logger_1.ServerLog)(logger_1.ServerModuleType.Mail, logger_1.MailActionType.attachListener, `${error.toString()}, ${error.message}`, logger_1.LogType.error);
+        (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener, `${error.message}`);
     }
 });
 exports.addMailListener = addMailListener;

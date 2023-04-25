@@ -1,37 +1,52 @@
 import chalk from "chalk";
 import moment from "moment";
-import * as fs from 'fs';
-import * as path from 'path';
-import {parse} from 'csv-parse';
+import * as fs from "fs";
+import * as path from "path";
+import { parse } from "csv-parse";
 
-export enum ServerModuleType {
+export enum ModuleType {
   Mail = "Mail",
   Binance = "Binance",
+  Server = "Server",
+  Api = 'Api',
+  Database = 'Database',
 }
 
-export enum MailActionType {
-  attachListener = "attach-listener",
-  receiveMail = "receive-mail",
-  error = "mail-error",
+export enum ActionType {
+  addMailListener = "add-mail-listener",
+  onReceiveMail = "on-receive-mail",
+  mailError = "mail-error",
+
+  serverStart = "server-start",
+  serverError = "server-error",
+
+  apiStarted = "api-start",
+  apiError = "api-error",
+  apiEndpoint = 'api-endpoint',
+
+  connectDatabase = "connect-database",
+  databaseError = "database-error",
 }
 
 export enum LogType {
-  info = '[Info]',
-  warn = '[Warning]',
-  error = '[Error]',
-  success = '[Successful]',
+  info = "[Info]",
+  warn = "[Warning]",
+  error = "[Error]",
+  success = "[Successful]",
 }
 
-export interface IServerLog{
-  module: ServerModuleType,
-  action: MailActionType,
-  context?: string,
-  logLevel?: LogType
+export interface IServerLog {
+  module: ModuleType;
+  action: ActionType;
+  context?: string;
+  logLevel?: LogType;
 }
 
 const writeServerLogToCsv = (serverLog: IServerLog, filePath: string): void => {
-  const headerRow = 'module,action,context,logLevel\n';
-  const dataRow = `${serverLog.module},${serverLog.action},${serverLog.context ?? ''},${serverLog.logLevel ?? ''}\n`;
+  const headerRow = "module,action,context,logLevel\n";
+  const dataRow = `${serverLog.module},${serverLog.action},${
+    serverLog.context ?? ""
+  },${serverLog.logLevel ?? ""}\n`;
 
   // If the file already exists, append the data to it; otherwise, create a new file.
   if (fs.existsSync(filePath)) {
@@ -41,7 +56,9 @@ const writeServerLogToCsv = (serverLog: IServerLog, filePath: string): void => {
   }
 };
 
-export const readServerLogFromCsv = async (filePath: string): Promise<IServerLog[]> => {
+export const readServerLogFromCsv = async (
+  filePath: string
+): Promise<IServerLog[]> => {
   const serverLogs: IServerLog[] = [];
 
   // Read the CSV file
@@ -67,21 +84,15 @@ export const readServerLogFromCsv = async (filePath: string): Promise<IServerLog
   return serverLogs;
 };
 
-export const ServerLog = (
-  module: ServerModuleType,
-  action: MailActionType,
+const Log = (
+  module: ModuleType,
+  action: ActionType,
   context?: string,
   logLevel?: LogType
 ) => {
-  if (!logLevel) {
-    logLevel= LogType.info;
-  }
-  const formattedTime = moment(new Date()).format('DD/MM/YYYY h:mm:ss');
-  
-  const str = `${formattedTime} ${logLevel.toString()} ${module.toString()} ${action.toString()}${context?' | '.concat(context).concat('.'):'.'}`
-  const _str = `> ${str}`;
+  const str = buildLogStr(module, action, logLevel, context);
 
-  // const str = `> ${module.toString()}, ${action.toString()}${context?',':'.'} ${context} ${logLevel === LogType.success? '[Successful]': logLevel === LogType.error?'[Failed]': ''}`;
+  const _str = `> ${str}`;
 
   switch (logLevel) {
     case LogType.error: {
@@ -93,14 +104,56 @@ export const ServerLog = (
       break;
     }
     case LogType.info: {
-      console.log(chalk.hex("#00ccff").bgHex('#0d0d0d').bold(_str));
+      console.log(chalk.hex("#00ccff").bgHex("#0d0d0d").bold(_str));
       break;
     }
     case LogType.success: {
-      console.log(chalk.hex("#66ff99").bgHex('#0d0d0d').bold(_str));
+      console.log(chalk.hex("#66ff99").bgHex("#0d0d0d").bold(_str));
       break;
     }
   }
+};
 
+const buildLogStr = (
+  module: ModuleType,
+  action: ActionType,
+  logLevel?: LogType,
+  context?: string
+) => {
+  const formattedTime = moment(new Date()).format("DD/MM/YYYY h:mm:ss");
 
+  const str = `${formattedTime} ${logLevel?.toString()} [${module.toString()}] [${action.toString()}] ${context?context.concat('.'):''}`;
+
+  return str;
+};
+export const serverError = (
+  module: ModuleType,
+  action: ActionType,
+  context?: string
+) => {
+  Log(module, action, context, LogType.error);
+};
+
+export const serverInfo = (
+  module: ModuleType,
+  action: ActionType,
+  context?: string
+) => {
+  Log(module, action, context, LogType.info);
+};
+
+export const serverWarn = (
+  module: ModuleType,
+  action: ActionType,
+  context?: string
+) => {
+  Log(module, action, context, LogType.warn);
+};
+
+export const serverSuccess = (
+  module: ModuleType,
+  action: ActionType,
+  context?: string
+) => {
+  Log(module, action, context, LogType.success);
 };

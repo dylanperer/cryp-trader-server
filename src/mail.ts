@@ -1,5 +1,5 @@
 import { MailListener, IMailObject } from "mail-listener-typescript";
-import { LogType, MailActionType, ServerLog, ServerModuleType } from "./logger";
+import { LogType, ActionType, ModuleType, serverInfo, serverError, serverSuccess } from './logger';
 
 
 const options = {
@@ -24,15 +24,20 @@ const options = {
 };
 
 const onMail = async (mail: IMailObject, seqno: any, attributes: any) => {
-  ServerLog(ServerModuleType.Mail, MailActionType.receiveMail, `${mail.subject}, ${mail.text}`);
+  serverInfo(ModuleType.Mail, ActionType.onReceiveMail, `${mail.subject}, ${mail.text}`);
 };
 
 const onError = async (error: any) => {
-  ServerLog(ServerModuleType.Mail, MailActionType.error, `${error.toString()}, ${error.message}`, LogType.error);
+  serverError(ModuleType.Mail, ActionType.mailError, `${error.toString()}, ${error.message}`);
 };
 
-export const addMailListener = async (email: string, password: string) => {
+export const addMailListener = async () => {
+  const email = process.env.EMAIL_ADDRESS;
+  const password = process.env.EMAIL_PASSWORD;
   try{
+    if(!email || !password){
+      throw new Error(`Invalid email or password`);
+    }
     const mailListener = new MailListener({...options, username: email, password:password});
 
     // Start
@@ -44,9 +49,9 @@ export const addMailListener = async (email: string, password: string) => {
     // Get erros
     mailListener.on("error",onError);
 
-    ServerLog(ServerModuleType.Mail, MailActionType.attachListener, '', LogType.success);
+    serverSuccess(ModuleType.Mail, ActionType.addMailListener);
 
   }catch(error: any){
-    ServerLog(ServerModuleType.Mail, MailActionType.attachListener, `${error.toString()}, ${error.message}`, LogType.error);
+    serverError(ModuleType.Mail, ActionType.addMailListener, `${error.message}`);
   }
 };
