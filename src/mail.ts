@@ -1,5 +1,6 @@
 //@ts-ignore
 import {MailListener} from 'mail-listener5';
+import { TradeModel } from './database/models/trade';
 
 import {
   LogType,
@@ -34,6 +35,13 @@ const onMail = async (mail: any, seqno: any, attributes: any) => {
     ActionType.onReceiveMail,
     `${mail.subject}, ${mail.text}`
   );
+
+  const _res = await TradeModel.insertMany([
+    {
+      tradeEvent: mail.subject,
+      entryPrice: 0.00
+    },
+  ]);
 };
 
 const onError = async (error: any) => {
