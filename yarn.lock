@@ -216,7 +216,7 @@ array-flatten@1.1.1:
   resolved "https://registry.yarnpkg.com/array-flatten/-/array-flatten-1.1.1.tgz#9a5f699051b1e7073328f2a008968b64ea2955d2"
   integrity sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==
 
-async@^3.2.1, async@^3.2.4:
+async@^3.2.4:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
   integrity sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==
@@ -379,7 +379,7 @@ cross-spawn@^7.0.0:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-csv-parse@*, csv-parse@^5.3.8:
+csv-parse@*:
   version "5.3.8"
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.3.8.tgz#c9919fbc5670fddec09a4b40e25365a2d11956d1"
   integrity sha512-ird8lzMv9I64oqIVIHdaTbT7Yr55n2C/Nv6m1LxO7nddLEeI67468VQ9Ik+r6lwYbK9kTE1oSqAVcVKc/Uqx6g==
@@ -813,15 +813,6 @@ lru-cache@^9.0.0:
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-9.1.1.tgz#c58a93de58630b688de39ad04ef02ef26f1902f1"
   integrity sha512-65/Jky17UwSb0BuB9V+MyDpsOtXKmYwzhyl+cOa9XUiI4uV2Ouy/2voFP3+al0BjZbJgMBD8FojMpAf+Z+qn4A==
 
-mail-listener-typescript@^1.0.18:
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/mail-listener-typescript/-/mail-listener-typescript-1.0.18.tgz#873cc371b2011bd1c0c0d8422da3e0c567bd53f6"
-  integrity sha512-tA1oyADkFseLcYByBMfC8sxu4nMFeAV+8toyiiWyBt+gtCAYM6/3mxBZ+2r7ymfgH0dtdsHorkK8B2tIywBrrg==
-  dependencies:
-    async "^3.2.1"
-    imap "^0.8.19"
-    mailparser "^3.3.0"
-
 mail-listener5@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/mail-listener5/-/mail-listener5-2.1.2.tgz#e90f0b8adc14766c970f33d58c25b4a497e50e8d"
@@ -831,7 +822,7 @@ mail-listener5@^2.1.2:
     imap "^0.8.19"
     mailparser "^3.6.3"
 
-mailparser@^3.3.0, mailparser@^3.6.3:
+mailparser@^3.6.3:
   version "3.6.4"
   resolved "https://registry.yarnpkg.com/mailparser/-/mailparser-3.6.4.tgz#ad96ecf64698051ae3ad2ef6286c5b9604a69800"
   integrity sha512-4bDgbLdlcBKX8jtVskfn/G93nZo3lf7pyuLbAQ031SHQLihEqxtRwHrb9SXMTqiTkEGlOdpDrZE5uH18O+2A+A==
@@ -1373,11 +1364,6 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
-
-ws@^8.13.0:
-  version "8.13.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
-  integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
 
 xtend@^4.0.0:
   version "4.0.2"
