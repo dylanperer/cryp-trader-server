@@ -14,19 +14,7 @@ const startServer = async() => {
 
     startExpress();
 
-    // addMailListener();
-    
-    await TradeModel.deleteMany({});
-
-    setInterval(async ()=>{
-       const res = await TradeModel.insertMany([
-        {
-          tradeEvent: moment().toLocaleString(),
-          entryPrice: 0.00
-        },
-      ]);
-      console.log('Inserted', res)
-    }, 2000)
+    addMailListener();
     
   } catch (error:any) {
     serverError(ModuleType.Server, ActionType.serverStart, `${error.message}`)    
