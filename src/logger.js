@@ -62,7 +62,7 @@ var ActionType;
     ActionType["mailError"] = "mail-error";
     ActionType["serverStart"] = "server-start";
     ActionType["serverError"] = "server-error";
-    ActionType["apiStarted"] = "api-start";
+    ActionType["apiStarted"] = "start-api";
     ActionType["apiError"] = "api-error";
     ActionType["apiEndpoint"] = "api-endpoint";
     ActionType["connectDatabase"] = "connect-database";
@@ -151,7 +151,7 @@ const Log = (module, action, context, logLevel) => {
 };
 const buildLogStr = (module, action, logLevel, context) => {
     const formattedTime = (0, moment_1.default)(new Date()).format("DD/MM/YYYY h:mm:ss");
-    const str = `${formattedTime} ${logLevel === null || logLevel === void 0 ? void 0 : logLevel.toString()} [${module.toString()}] [${action.toString()}] ${context ? context.concat('.') : ''}`;
+    const str = `${formattedTime} [${module.toString()}] [${action.toString()}] ${context ? context.concat('.') : ''}`;
     return str;
 };
 const serverError = (module, action, context) => {

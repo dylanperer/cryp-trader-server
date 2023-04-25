@@ -20,7 +20,7 @@ export enum ActionType {
   serverStart = "server-start",
   serverError = "server-error",
 
-  apiStarted = "api-start",
+  apiStarted = "start-api",
   apiError = "api-error",
   apiEndpoint = 'api-endpoint',
 
@@ -122,7 +122,7 @@ const buildLogStr = (
 ) => {
   const formattedTime = moment(new Date()).format("DD/MM/YYYY h:mm:ss");
 
-  const str = `${formattedTime} ${logLevel?.toString()} [${module.toString()}] [${action.toString()}] ${context?context.concat('.'):''}`;
+  const str = `${formattedTime} [${module.toString()}] [${action.toString()}] ${context?context.concat('.'):''}`;
 
   return str;
 };
