@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const healthController_1 = require("./src/api/healthController");
-const mail_1 = require("./src/mail");
 const logger_1 = require("./src/logger");
 const mongoose_1 = require("./src/database/mongoose");
 const moment_1 = __importDefault(require("moment"));
@@ -24,7 +23,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, mongoose_1.connectDatabase)();
         (0, healthController_1.startExpress)();
-        (0, mail_1.addMailListener)();
+        // addMailListener();
         yield trade_1.TradeModel.deleteMany({});
         setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield trade_1.TradeModel.insertMany([
@@ -34,7 +33,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
                 },
             ]);
             console.log('Inserted', res);
-        }), 1000);
+        }), 2000);
     }
     catch (error) {
         (0, logger_1.serverError)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${error.message}`);

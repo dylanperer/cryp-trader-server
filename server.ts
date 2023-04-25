@@ -14,7 +14,7 @@ const startServer = async() => {
 
     startExpress();
 
-    addMailListener();
+    // addMailListener();
     
     await TradeModel.deleteMany({});
 
