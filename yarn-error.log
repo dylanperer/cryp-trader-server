@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\dylan\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @types/mail-listener5
+  C:\Program Files\nodejs\node.exe C:\Users\dylan\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add prisma @types/prisma
 
 PATH: 
   C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\chocolatey\bin;C:\Users\dylan\AppData\Local\Microsoft\WindowsApps;C:\Users\dylan\AppData\Roaming\npm;C:\Users\dylan\AppData\Local\GitHubDesktop\bin;C:\Users\dylan\.dotnet\tools;C:\ProgramData\chocolatey\lib\deno;;C:\Users\dylan\.deno\bin
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fmail-listener5: Not found
+  Error: https://registry.yarnpkg.com/@types%2fprisma: Not found
       at params.callback [as _callback] (C:\Users\dylan\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66145:18)
       at self.callback (C:\Users\dylan\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140890:22)
       at Request.emit (node:events:513:28)
@@ -33,7 +33,8 @@ npm manifest:
     "description": "",
     "main": "server.js",
     "scripts": {
-      "dev": "tsc && node server.js"
+      "dev": "tsc && node server.js",
+      "prod": "git merge origin/master && tsc && node server.js"
     },
     "keywords": [],
     "author": "",

@@ -4,12 +4,14 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "dev": "tsc && node server.js"
+    "dev": "tsc && node server.js",
+    "prod": "git merge origin/master && tsc && node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^4.13.0",
     "chalk": "4.1.2",
     "csv-parse": "^5.3.8",
     "dotenv": "^16.0.3",
@@ -19,6 +21,7 @@
     "moment": "^2.29.4",
     "mongoose": "^7.0.5",
     "nodemailer": "^6.9.1",
+    "prisma": "^4.13.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4",
     "ws": "^8.13.0"
