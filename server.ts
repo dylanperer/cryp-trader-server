@@ -9,6 +9,8 @@ dotenv.config();
 
 const startServer = async() => {
   try {
+    const deleteLogsRes = await prisma.log.deleteMany();
+    serverInfo(ModuleType.Server, ActionType.serverStart, `${deleteLogsRes.count} old logs cleared`);
     startExpress();
 
     addMailListener();

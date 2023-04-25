@@ -20,10 +20,10 @@ const prisma_1 = require("./prisma/prisma");
 dotenv_1.default.config();
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const deleteLogsRes = yield prisma_1.prisma.log.deleteMany();
+        (0, logger_1.serverInfo)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${deleteLogsRes.count} old logs cleared`);
         (0, healthController_1.startExpress)();
         (0, mail_1.addMailListener)();
-        const trade = yield prisma_1.prisma.trade.create({ data: { side: 'sell', entryPrice: 10, exitPrice: 0 } });
-        console.log(trade);
     }
     catch (error) {
         (0, logger_1.serverError)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${error.message}`);

@@ -162,7 +162,7 @@ const buildLogStr = (module, action, logLevel, context) => {
             context,
         },
     })
-        .then((res) => console.log(res));
+        .then();
     return str;
 };
 const serverError = (module, action, context) => {
