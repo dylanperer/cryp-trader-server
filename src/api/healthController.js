@@ -17,7 +17,6 @@ const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const ws_1 = __importDefault(require("ws"));
 const logger_1 = require("../logger");
-const trade_1 = require("../database/models/trade");
 const logger_2 = require("../logger");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
@@ -33,17 +32,7 @@ app.use((req, res, next) => {
 });
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const _res = yield trade_1.TradeModel.insertMany([
-            {
-                tradeEvent: 'Buy',
-                entryPrice: 10.99
-            },
-            {
-                tradeEvent: 'Sell',
-                entryPrice: 12.34
-            }
-        ]);
-        res.send(_res);
+        res.send("OK");
     }
     catch (error) {
         (0, logger_1.serverError)(logger_2.ModuleType.Api, logger_2.ActionType.apiEndpoint, '/');

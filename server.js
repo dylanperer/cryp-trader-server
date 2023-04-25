@@ -16,7 +16,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const healthController_1 = require("./src/api/healthController");
 const mail_1 = require("./src/mail");
 const logger_1 = require("./src/logger");
-const prisma_1 = require("./src/database/prisma");
+const prisma_1 = require("./prisma/prisma");
 dotenv_1.default.config();
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {

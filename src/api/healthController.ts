@@ -2,7 +2,6 @@ import express from "express";
 import http from "http";
 import WebSocket from "ws";
 import { serverSuccess, serverError } from '../logger';
-import { TradeModel } from '../database/models/trade';
 
 
 import {
@@ -35,17 +34,7 @@ app.use((req, res, next) => {
 
 app.get("/", async (req, res) => {
   try {
-    const _res = await TradeModel.insertMany([
-      {
-        tradeEvent: 'Buy',
-        entryPrice: 10.99
-      },
-      {
-        tradeEvent: 'Sell',
-        entryPrice: 12.34
-      }
-    ]);
-    res.send(_res)
+    res.send("OK")
   } catch (error) {
     serverError(ModuleType.Api, ActionType.apiEndpoint, '/');
   }

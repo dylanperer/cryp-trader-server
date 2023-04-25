@@ -1,6 +1,5 @@
 //@ts-ignore
 import {MailListener} from 'mail-listener5';
-import { TradeModel } from './database/models/trade';
 
 import {
   LogType,
