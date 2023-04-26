@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { parse } from "csv-parse";
 import { prisma } from "../prisma/prisma";
+import { _SESSION_ID } from '../server';
 
 export enum ModuleType {
   Mail = "Mail",
@@ -27,6 +28,7 @@ export enum ActionType {
 
   connectDatabase = "connect-database",
   databaseError = "database-error",
+  databaseInsert = 'database-insert',
 }
 
 export enum LogType {
@@ -130,6 +132,7 @@ const buildLogStr = (
   prisma.log
     .create({
       data: {
+        sessionId: _SESSION_ID,
         module: module.toString(),
         action: action.toString(),
         logLevel: logLevel?.toString() || LogType.info.toString(),

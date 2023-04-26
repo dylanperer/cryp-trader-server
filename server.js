@@ -12,16 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports._SESSION_ID = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const healthController_1 = require("./src/api/healthController");
 const mail_1 = require("./src/mail");
 const logger_1 = require("./src/logger");
-const prisma_1 = require("./prisma/prisma");
+const uuid_1 = require("uuid");
 dotenv_1.default.config();
-const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
+exports._SESSION_ID = (0, uuid_1.v4)();
+const configureServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const deleteLogsRes = yield prisma_1.prisma.log.deleteMany();
-        (0, logger_1.serverInfo)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${deleteLogsRes.count} old logs cleared`);
         (0, healthController_1.startExpress)();
         (0, mail_1.addMailListener)();
     }
@@ -29,4 +29,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         (0, logger_1.serverError)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${error.message}`);
     }
 });
-startServer();
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield configureServer();
+});
+main();

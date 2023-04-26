@@ -19,10 +19,11 @@ model Trade {
 }
 
 model Log {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  module    String
-  action    String
-  logLevel  String
-  context   String?
+  id            Int          @id @default(autoincrement())
+  sessionId     String       
+  module        String
+  action        String
+  logLevel      String
+  context       String?
+  createdAt     DateTime     @default(now())
 }
