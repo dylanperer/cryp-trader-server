@@ -5,3 +5,4 @@ ssh
 ssh.pub
 prisma/migrations/
 prisma/cryp-trader.db
+prisma/cryp-trader.db-journal

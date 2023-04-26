@@ -6,9 +6,8 @@
   "scripts": {
     "dev": "tsc && node server.js",
     "git": "git reset --hard origin/master",
-    "prisma-migrate": "prisma migrate dev",
-    "prisma": "prisma generate dev",
-    "prod": "node server.js"
+    "prod": "node server.js",
+    "prisma-reset": "rimraf prisma/migrations prisma/cryp-trader.db prisma/cryp-trader.db-journal && prisma migrate dev && prisma generate"
   },
   "keywords": [],
   "author": "",
