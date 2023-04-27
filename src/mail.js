@@ -19,6 +19,8 @@ var TradeSide;
 (function (TradeSide) {
     TradeSide["LONG"] = "LONG";
     TradeSide["SHORT"] = "SHORT";
+    TradeSide["STOP_LOSS_SHORT"] = "STOP LOSS SHORT";
+    TradeSide["STOP_LOSS_LONG"] = "STOP LOSS LONG";
 })(TradeSide = exports.TradeSide || (exports.TradeSide = {}));
 const logger_1 = require("./logger");
 const options = {
@@ -41,8 +43,12 @@ const options = {
 const onMail = (mail, seqno, attributes, startTime, seenUIDs) => __awaiter(void 0, void 0, void 0, function* () {
     const find = seenUIDs.find((c) => c.subject === mail.subject && c.uid === attributes.uid);
     if (!find && mail.date > startTime) {
-        seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
-        (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${mail.subject}`);
+        const alert = yield parseAlert(mail.subject);
+        if (alert) {
+            const alertStr = `${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
+            seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
+            (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${alertStr}`);
+        }
     }
 });
 const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,12 +57,12 @@ const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
     _MAIL_LISTENER_REFRESH_ATTEMPTS -= 1;
     (0, exports.addMailListener)();
 });
-const parseAlert = (subject) => {
+const parseAlert = (subject) => __awaiter(void 0, void 0, void 0, function* () {
     //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
     try {
         const split = subject.split(",");
         const receivedAt = new Date(split[0].replace("Alert:", "").trim());
-        const side = split[1].trim();
+        const side = split[1].trim().toUpperCase();
         const coin = split[2].replace("buy", "").trim();
         const price = Number(split[3]);
         console.log(receivedAt, side, coin, price);
@@ -65,7 +71,7 @@ const parseAlert = (subject) => {
                 throw new Error("Alert parsing failed");
             }
         }
-        prisma_1.prisma.alert.create({
+        return yield prisma_1.prisma.alert.create({
             data: {
                 coin: coin,
                 side: side,
@@ -77,9 +83,8 @@ const parseAlert = (subject) => {
     catch (error) {
         (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.alertParse, `${error.message}`);
     }
-};
+});
 const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
-    parseAlert("Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03");
     const email = process.env.EMAIL_ADDRESS;
     const password = process.env.EMAIL_PASSWORD;
     try {

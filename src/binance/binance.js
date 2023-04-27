@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectToBinance = void 0;
+exports.startTrade = exports.connectToBinance = void 0;
 const binance_1 = require("binance");
 const logger_1 = require("../logger");
 const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -31,3 +31,8 @@ const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.connectToBinance = connectToBinance;
+const startTrade = () => {
+    //check balance of coin pair
+    //get 
+};
+exports.startTrade = startTrade;

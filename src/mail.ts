@@ -8,6 +8,8 @@ let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 export enum TradeSide {
   LONG = "LONG",
   SHORT = "SHORT",
+  STOP_LOSS_SHORT = "STOP LOSS SHORT",
+  STOP_LOSS_LONG = "STOP LOSS LONG",
 }
 
 import {
@@ -49,8 +51,13 @@ const onMail = async (
   );
 
   if (!find && mail.date > startTime) {
-    seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
-    serverInfo(ModuleType.Mail, ActionType.onReceiveMail, `${mail.subject}`);
+    const alert = await parseAlert(mail.subject);
+    if (alert) {
+      const alertStr = `${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
+
+      seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
+      serverInfo(ModuleType.Mail, ActionType.onReceiveMail, `${alertStr}`);
+    }
   }
 };
 
@@ -72,13 +79,13 @@ const onError = async (error: any) => {
   addMailListener();
 };
 
-const parseAlert = (subject: string) => {
+const parseAlert = async (subject: string) => {
   //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
   try {
     const split = subject.split(",");
 
     const receivedAt = new Date(split[0].replace("Alert:", "").trim());
-    const side = split[1].trim() as TradeSide;
+    const side = split[1].trim().toUpperCase() as TradeSide;
     const coin = split[2].replace("buy", "").trim();
     const price = Number(split[3]);
 
@@ -90,7 +97,7 @@ const parseAlert = (subject: string) => {
       }
     }
 
-    prisma.alert.create({
+    return await prisma.alert.create({
       data: {
         coin: coin,
         side: side,
@@ -104,7 +111,6 @@ const parseAlert = (subject: string) => {
 };
 
 export const addMailListener = async () => {
-  parseAlert("Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03");
   const email = process.env.EMAIL_ADDRESS;
   const password = process.env.EMAIL_PASSWORD;
   try {
