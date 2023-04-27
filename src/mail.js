@@ -45,7 +45,9 @@ const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
     _MAIL_LISTENER_REFRESH_ATTEMPTS -= 1;
     (0, exports.addMailListener)();
 });
-const onReady = () => __awaiter(void 0, void 0, void 0, function* () { });
+const parseAlert = (subject) => {
+    //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
+};
 const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
     const email = process.env.EMAIL_ADDRESS;
     const password = process.env.EMAIL_PASSWORD;

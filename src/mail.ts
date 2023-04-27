@@ -66,7 +66,10 @@ const onError = async (error: any) => {
   addMailListener();
 };
 
-const onReady = async () => {};
+const parseAlert = (subject: string)=>{
+  //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
+  
+};
 
 export const addMailListener = async () => {
   const email = process.env.EMAIL_ADDRESS;

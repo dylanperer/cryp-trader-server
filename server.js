@@ -19,6 +19,7 @@ const mail_1 = require("./src/mail");
 const logger_1 = require("./src/logger");
 const uuid_1 = require("uuid");
 const moment_1 = __importDefault(require("moment"));
+const binance_1 = require("./src/binance/binance");
 dotenv_1.default.config();
 exports._SESSION_ID = (0, uuid_1.v4)();
 exports._SERVER_START_TIME = (0, moment_1.default)();
@@ -26,6 +27,7 @@ const configureServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         (0, healthController_1.startExpress)();
         (0, mail_1.addMailListener)();
+        yield (0, binance_1.connectToBinance)();
     }
     catch (error) {
         (0, logger_1.serverError)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${error.message}`);

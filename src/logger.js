@@ -54,23 +54,24 @@ var ModuleType;
     ModuleType["Mail"] = "Mail";
     ModuleType["Binance"] = "Binance";
     ModuleType["Server"] = "Server";
-    ModuleType["Api"] = "Api";
+    ModuleType["Api"] = "Express";
     ModuleType["Database"] = "Database";
 })(ModuleType = exports.ModuleType || (exports.ModuleType = {}));
 var ActionType;
 (function (ActionType) {
-    ActionType["addMailListener"] = "add-mail-listener";
-    ActionType["onReceiveMail"] = "on-receive-mail";
-    ActionType["mailError"] = "mail-error";
-    ActionType["mailRestart"] = "mail-restart";
-    ActionType["serverStart"] = "server-start";
-    ActionType["serverError"] = "server-error";
-    ActionType["apiStarted"] = "start-api";
-    ActionType["apiError"] = "api-error";
-    ActionType["apiEndpoint"] = "api-endpoint";
-    ActionType["connectDatabase"] = "connect-database";
-    ActionType["databaseError"] = "database-error";
-    ActionType["databaseInsert"] = "database-insert";
+    ActionType["addMailListener"] = "Attaching mail listener";
+    ActionType["onReceiveMail"] = "Receiving mail";
+    ActionType["mailError"] = "Mail error";
+    ActionType["mailRestart"] = "Restarting listener";
+    ActionType["serverStart"] = "String server";
+    ActionType["serverError"] = "Server error";
+    ActionType["apiStarted"] = "Starting express api";
+    ActionType["apiError"] = "Express error";
+    ActionType["apiEndpoint"] = "Express endpoint";
+    ActionType["connectDatabase"] = "Connecting to database";
+    ActionType["databaseError"] = "Database error";
+    ActionType["databaseInsert"] = "Inserting into database";
+    ActionType["connectBinance"] = "Connecting to binance";
 })(ActionType = exports.ActionType || (exports.ActionType = {}));
 var LogType;
 (function (LogType) {
@@ -163,7 +164,7 @@ const buildLogStr = (module, action, logLevel, context) => {
             module: module.toString(),
             action: action.toString(),
             logLevel: (logLevel === null || logLevel === void 0 ? void 0 : logLevel.toString()) || LogType.info.toString(),
-            context,
+            context: context
         },
     })
         .then();

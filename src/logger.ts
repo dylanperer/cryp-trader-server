@@ -10,26 +10,28 @@ export enum ModuleType {
   Mail = "Mail",
   Binance = "Binance",
   Server = "Server",
-  Api = "Api",
+  Api = "Express",
   Database = "Database",
 }
 
 export enum ActionType {
-  addMailListener = "add-mail-listener",
-  onReceiveMail = "on-receive-mail",
-  mailError = "mail-error",
-  mailRestart = "mail-restart",
+  addMailListener = "Attaching mail listener",
+  onReceiveMail = "Receiving mail",
+  mailError = "Mail error",
+  mailRestart = "Restarting listener",
 
-  serverStart = "server-start",
-  serverError = "server-error",
+  serverStart = "String server",
+  serverError = "Server error",
 
-  apiStarted = "start-api",
-  apiError = "api-error",
-  apiEndpoint = "api-endpoint",
+  apiStarted = "Starting express api",
+  apiError = "Express error",
+  apiEndpoint = "Express endpoint",
 
-  connectDatabase = "connect-database",
-  databaseError = "database-error",
-  databaseInsert = 'database-insert',
+  connectDatabase = "Connecting to database",
+  databaseError = "Database error",
+  databaseInsert = 'Inserting into database',
+
+  connectBinance = 'Connecting to binance'
 }
 
 export enum LogType {
@@ -137,7 +139,7 @@ const buildLogStr = (
         module: module.toString(),
         action: action.toString(),
         logLevel: logLevel?.toString() || LogType.info.toString(),
-        context,
+        context: context
       },
     })
     .then();
