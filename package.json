@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "tsc && node server.js",
-    "git": "git reset --hard origin/master",
+    "update": "git fetch && git reset --hard origin/master && install",
     "prod": "node server.js",
     "prisma-reset": "rimraf prisma/migrations prisma/cryp-trader.db prisma/cryp-trader.db-journal && prisma migrate dev && prisma generate"
   },
