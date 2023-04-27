@@ -1,6 +1,8 @@
 //@ts-ignore
 import { MailListener } from "mail-listener5";
 import moment from "moment";
+import { _SERVER_START_TIME } from "../server";
+let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 
 import {
   LogType,
@@ -42,12 +44,7 @@ const onMail = async (
 
   if (!find && mail.date > startTime) {
     seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
-    serverInfo(
-      ModuleType.Mail,
-      ActionType.onReceiveMail,
-      `${mail.subject}`
-    );
-    
+    serverInfo(ModuleType.Mail, ActionType.onReceiveMail, `${mail.subject}`);
   }
 };
 
@@ -57,6 +54,16 @@ const onError = async (error: any) => {
     ActionType.mailError,
     `${error.toString()}, ${error.message}`
   );
+
+  serverInfo(
+    ModuleType.Mail,
+    ActionType.mailRestart,
+    `restarting, attempts remaining ${_MAIL_LISTENER_REFRESH_ATTEMPTS}...`
+  );
+
+  _MAIL_LISTENER_REFRESH_ATTEMPTS -= 1;
+
+  addMailListener();
 };
 
 const onReady = async () => {};
@@ -69,7 +76,10 @@ export const addMailListener = async () => {
       throw new Error(`Invalid email or password`);
     }
 
-    const startTime = moment();
+    if (_MAIL_LISTENER_REFRESH_ATTEMPTS === 0) {
+      throw new Error("Mail listener failed to restart");
+    }
+
     const seenUIDs: Array<{ uid: number; subject: string }> = [];
 
     const mailListener = new MailListener({
@@ -86,7 +96,7 @@ export const addMailListener = async () => {
 
     mailListener.on("server:connected", () => {
       mailListener.on("mail", (mail: any, seqno: any, attributes: any) => {
-        onMail(mail, seqno, attributes, startTime.toDate(), seenUIDs);
+        onMail(mail, seqno, attributes, _SERVER_START_TIME.toDate(), seenUIDs);
       });
       serverSuccess(ModuleType.Mail, ActionType.addMailListener);
     });
@@ -98,5 +108,6 @@ export const addMailListener = async () => {
       ActionType.addMailListener,
       `${error.message}`
     );
+    process.exit(1);
   }
 };

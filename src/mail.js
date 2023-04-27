@@ -8,14 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addMailListener = void 0;
 //@ts-ignore
 const mail_listener5_1 = require("mail-listener5");
-const moment_1 = __importDefault(require("moment"));
+const server_1 = require("../server");
+let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 const logger_1 = require("./logger");
 const options = {
     username: "imap-username",
@@ -43,6 +41,9 @@ const onMail = (mail, seqno, attributes, startTime, seenUIDs) => __awaiter(void 
 });
 const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
     (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.mailError, `${error.toString()}, ${error.message}`);
+    (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.mailRestart, `restarting, attempts remaining ${_MAIL_LISTENER_REFRESH_ATTEMPTS}...`);
+    _MAIL_LISTENER_REFRESH_ATTEMPTS -= 1;
+    (0, exports.addMailListener)();
 });
 const onReady = () => __awaiter(void 0, void 0, void 0, function* () { });
 const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -52,7 +53,9 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!email || !password) {
             throw new Error(`Invalid email or password`);
         }
-        const startTime = (0, moment_1.default)();
+        if (_MAIL_LISTENER_REFRESH_ATTEMPTS === 0) {
+            throw new Error("Mail listener failed to restart");
+        }
         const seenUIDs = [];
         const mailListener = new mail_listener5_1.MailListener(Object.assign(Object.assign({}, options), { username: email, password: password }));
         // Start
@@ -61,7 +64,7 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
         mailListener.on("error", onError);
         mailListener.on("server:connected", () => {
             mailListener.on("mail", (mail, seqno, attributes) => {
-                onMail(mail, seqno, attributes, startTime.toDate(), seenUIDs);
+                onMail(mail, seqno, attributes, server_1._SERVER_START_TIME.toDate(), seenUIDs);
             });
             (0, logger_1.serverSuccess)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener);
         });
@@ -69,6 +72,7 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener, `${error.message}`);
+        process.exit(1);
     }
 });
 exports.addMailListener = addMailListener;

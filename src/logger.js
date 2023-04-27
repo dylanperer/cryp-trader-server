@@ -62,6 +62,7 @@ var ActionType;
     ActionType["addMailListener"] = "add-mail-listener";
     ActionType["onReceiveMail"] = "on-receive-mail";
     ActionType["mailError"] = "mail-error";
+    ActionType["mailRestart"] = "mail-restart";
     ActionType["serverStart"] = "server-start";
     ActionType["serverError"] = "server-error";
     ActionType["apiStarted"] = "start-api";

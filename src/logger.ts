@@ -18,6 +18,7 @@ export enum ActionType {
   addMailListener = "add-mail-listener",
   onReceiveMail = "on-receive-mail",
   mailError = "mail-error",
+  mailRestart = "mail-restart",
 
   serverStart = "server-start",
   serverError = "server-error",
