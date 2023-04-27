@@ -20,3 +20,9 @@ export const connectToBinance = async () => {
   }
 };
 
+export const startTrade = ()=>{
+  //check balance of coin pair
+  
+  //get 
+}
+

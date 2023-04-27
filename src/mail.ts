@@ -1,8 +1,14 @@
 //@ts-ignore
 import { MailListener } from "mail-listener5";
 import moment from "moment";
+import { prisma } from "../prisma/prisma";
 import { _SERVER_START_TIME } from "../server";
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
+
+export enum TradeSide {
+  LONG = "LONG",
+  SHORT = "SHORT",
+}
 
 import {
   LogType,
@@ -66,12 +72,39 @@ const onError = async (error: any) => {
   addMailListener();
 };
 
-const parseAlert = (subject: string)=>{
+const parseAlert = (subject: string) => {
   //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
-  
+  try {
+    const split = subject.split(",");
+
+    const receivedAt = new Date(split[0].replace("Alert:", "").trim());
+    const side = split[1].trim() as TradeSide;
+    const coin = split[2].replace("buy", "").trim();
+    const price = Number(split[3]);
+
+    console.log(receivedAt, side, coin, price);
+
+    if (subject.toLowerCase().includes("alert")) {
+      if (!receivedAt || !side || !price) {
+        throw new Error("Alert parsing failed");
+      }
+    }
+
+    prisma.alert.create({
+      data: {
+        coin: coin,
+        side: side,
+        price: price,
+        receivedAt: receivedAt,
+      },
+    });
+  } catch (error: any) {
+    serverError(ModuleType.Mail, ActionType.alertParse, `${error.message}`);
+  }
 };
 
 export const addMailListener = async () => {
+  parseAlert("Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03");
   const email = process.env.EMAIL_ADDRESS;
   const password = process.env.EMAIL_PASSWORD;
   try {

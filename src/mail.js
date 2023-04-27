@@ -9,11 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMailListener = void 0;
+exports.addMailListener = exports.TradeSide = void 0;
 //@ts-ignore
 const mail_listener5_1 = require("mail-listener5");
+const prisma_1 = require("../prisma/prisma");
 const server_1 = require("../server");
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
+var TradeSide;
+(function (TradeSide) {
+    TradeSide["LONG"] = "LONG";
+    TradeSide["SHORT"] = "SHORT";
+})(TradeSide = exports.TradeSide || (exports.TradeSide = {}));
 const logger_1 = require("./logger");
 const options = {
     username: "imap-username",
@@ -47,8 +53,33 @@ const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const parseAlert = (subject) => {
     //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
+    try {
+        const split = subject.split(",");
+        const receivedAt = new Date(split[0].replace("Alert:", "").trim());
+        const side = split[1].trim();
+        const coin = split[2].replace("buy", "").trim();
+        const price = Number(split[3]);
+        console.log(receivedAt, side, coin, price);
+        if (subject.toLowerCase().includes("alert")) {
+            if (!receivedAt || !side || !price) {
+                throw new Error("Alert parsing failed");
+            }
+        }
+        prisma_1.prisma.alert.create({
+            data: {
+                coin: coin,
+                side: side,
+                price: price,
+                receivedAt: receivedAt,
+            },
+        });
+    }
+    catch (error) {
+        (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.alertParse, `${error.message}`);
+    }
 };
 const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
+    parseAlert("Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03");
     const email = process.env.EMAIL_ADDRESS;
     const password = process.env.EMAIL_PASSWORD;
     try {

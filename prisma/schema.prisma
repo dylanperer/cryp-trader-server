@@ -9,8 +9,9 @@ datasource db {
 
 model Alert {
   id                              Int      @id @default(autoincrement())
+  coin                            String
   side                            String
-  entryPrice                      Float
+  price                           Float
   receivedAt                      DateTime
   createdAt                       DateTime @default(now())
   Trade_Trade_exitAlterIdToAlert  Trade[]  @relation("Trade_exitAlterIdToAlert")

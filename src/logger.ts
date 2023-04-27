@@ -19,6 +19,7 @@ export enum ActionType {
   onReceiveMail = "Receiving mail",
   mailError = "Mail error",
   mailRestart = "Restarting listener",
+  alertParse = 'Parsing alert',
 
   serverStart = "String server",
   serverError = "Server error",
