@@ -26,7 +26,7 @@ exports._SERVER_START_TIME = (0, moment_1.default)();
 const configureServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         (0, healthController_1.startExpress)();
-        (0, mail_1.addMailListener)();
+        yield (0, mail_1.addMailListener)();
         yield (0, binance_1.connectToBinance)();
     }
     catch (error) {

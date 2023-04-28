@@ -53,7 +53,7 @@ const onMail = async (
   if (!find && mail.date > startTime) {
     const alert = await parseAlert(mail.subject);
     if (alert) {
-      const alertStr = `${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
+      const alertStr = `${alert.delay}s, ${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
 
       seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
       serverInfo(ModuleType.Mail, ActionType.onReceiveMail, `${alertStr}`);
@@ -97,17 +97,29 @@ const parseAlert = async (subject: string) => {
       }
     }
 
+    const delay = new Date().getTime() - receivedAt.getTime();
+    const diffInSeconds = Math.floor(delay / 1000);
+
+    console.log(new Date().getTime(), receivedAt.getTime());
     return await prisma.alert.create({
       data: {
         coin: coin,
         side: side,
         price: price,
         receivedAt: receivedAt,
+        delay: diffInSeconds,
       },
     });
   } catch (error: any) {
     serverError(ModuleType.Mail, ActionType.alertParse, `${error.message}`);
   }
+};
+
+export const getDelay = (t1: number, t2: number) => {
+  const moment1 = moment.unix(t1);
+  const moment2 = moment.unix(t2);
+
+  return moment2.diff(moment1, "seconds");
 };
 
 export const addMailListener = async () => {
@@ -143,6 +155,8 @@ export const addMailListener = async () => {
       serverSuccess(ModuleType.Mail, ActionType.addMailListener);
     });
 
+    return mailListener;
+
     // Simple example of how to get all attachments from an email
   } catch (error: any) {
     serverError(
@@ -152,4 +166,10 @@ export const addMailListener = async () => {
     );
     process.exit(1);
   }
+  
 };
+
+
+export const attachMailListener = async ()=>{
+  const m = await addMailListener();
+}

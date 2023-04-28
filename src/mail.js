@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMailListener = exports.TradeSide = void 0;
+exports.attachMailListener = exports.addMailListener = exports.getDelay = exports.TradeSide = void 0;
 //@ts-ignore
 const mail_listener5_1 = require("mail-listener5");
+const moment_1 = __importDefault(require("moment"));
 const prisma_1 = require("../prisma/prisma");
 const server_1 = require("../server");
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
@@ -45,7 +49,7 @@ const onMail = (mail, seqno, attributes, startTime, seenUIDs) => __awaiter(void 
     if (!find && mail.date > startTime) {
         const alert = yield parseAlert(mail.subject);
         if (alert) {
-            const alertStr = `${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
+            const alertStr = `${alert.delay}s, ${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
             seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
             (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${alertStr}`);
         }
@@ -71,12 +75,16 @@ const parseAlert = (subject) => __awaiter(void 0, void 0, void 0, function* () {
                 throw new Error("Alert parsing failed");
             }
         }
+        const delay = new Date().getTime() - receivedAt.getTime();
+        const diffInSeconds = Math.floor(delay / 1000);
+        console.log(new Date().getTime(), receivedAt.getTime());
         return yield prisma_1.prisma.alert.create({
             data: {
                 coin: coin,
                 side: side,
                 price: price,
                 receivedAt: receivedAt,
+                delay: diffInSeconds,
             },
         });
     }
@@ -84,6 +92,12 @@ const parseAlert = (subject) => __awaiter(void 0, void 0, void 0, function* () {
         (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.alertParse, `${error.message}`);
     }
 });
+const getDelay = (t1, t2) => {
+    const moment1 = moment_1.default.unix(t1);
+    const moment2 = moment_1.default.unix(t2);
+    return moment2.diff(moment1, "seconds");
+};
+exports.getDelay = getDelay;
 const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
     const email = process.env.EMAIL_ADDRESS;
     const password = process.env.EMAIL_PASSWORD;
@@ -106,6 +120,7 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
             });
             (0, logger_1.serverSuccess)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener);
         });
+        return mailListener;
         // Simple example of how to get all attachments from an email
     }
     catch (error) {
@@ -114,3 +129,7 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.addMailListener = addMailListener;
+const attachMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
+    const m = yield (0, exports.addMailListener)();
+});
+exports.attachMailListener = attachMailListener;

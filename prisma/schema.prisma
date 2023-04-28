@@ -14,6 +14,7 @@ model Alert {
   price                           Float
   receivedAt                      DateTime
   createdAt                       DateTime @default(now())
+  delay                           Int
   Trade_Trade_exitAlterIdToAlert  Trade[]  @relation("Trade_exitAlterIdToAlert")
   Trade_Trade_entryAlertIdToAlert Trade[]  @relation("Trade_entryAlertIdToAlert")
 }

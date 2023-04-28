@@ -63,6 +63,7 @@ var ActionType;
     ActionType["onReceiveMail"] = "Receiving mail";
     ActionType["mailError"] = "Mail error";
     ActionType["mailRestart"] = "Restarting listener";
+    ActionType["mailRefresh"] = "Restarting refresh";
     ActionType["alertParse"] = "Parsing alert";
     ActionType["serverStart"] = "String server";
     ActionType["serverError"] = "Server error";
