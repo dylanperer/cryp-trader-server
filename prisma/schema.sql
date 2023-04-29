@@ -5,27 +5,29 @@ DROP TABLE IF EXISTS Trade;
 
 CREATE TABLE Log
 (
-    id        INT          NOT NULL PRIMARY KEY,
+    id        INTEGER      NOT NULL PRIMARY KEY AUTOINCREMENT,
     sessionId VARCHAR(255) NOT NULL,
     module    VARCHAR(255) NOT NULL,
     action    VARCHAR(255) NOT NULL,
     logLevel  VARCHAR(255) NOT NULL,
-    context   TEXT         NOT NULL,
+    context   TEXT,
     createdAt DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Alert
 (
-    id         INT         NOT NULL PRIMARY KEY,
-    side       VARCHAR(10) NOT NULL,
-    entryPrice REAL        NOT NULL,
-    receivedAt DATETIME    NOT NULL,
-    createdAt  DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id         INTEGER      NOT NULL PRIMARY KEY AUTOINCREMENT,
+    coin       VARCHAR(255) NOT NULL,
+    side       VARCHAR(10)  NOT NULL,
+    price      REAL         NOT NULL,
+    receivedAt DATETIME     NOT NULL,
+    createdAt  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    delay      INTEGER      NOT NULL
 );
 
 CREATE TABLE Trade
 (
-    id           INT         NOT NULL PRIMARY KEY,
+    id           INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT,
     side         VARCHAR(10) NOT NULL,
     entryPrice   REAL        NOT NULL,
     entryAlertId INT         NOT NULL,

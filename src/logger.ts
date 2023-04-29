@@ -141,7 +141,7 @@ const buildLogStr = (
         module: module.toString(),
         action: action.toString(),
         logLevel: logLevel?.toString() || LogType.info.toString(),
-        context: context
+        context: context,
       },
     })
     .then();

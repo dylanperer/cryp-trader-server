@@ -166,7 +166,7 @@ const buildLogStr = (module, action, logLevel, context) => {
             module: module.toString(),
             action: action.toString(),
             logLevel: (logLevel === null || logLevel === void 0 ? void 0 : logLevel.toString()) || LogType.info.toString(),
-            context: context
+            context: context,
         },
     })
         .then();
