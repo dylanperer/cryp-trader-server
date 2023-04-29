@@ -13,7 +13,6 @@ export const _SERVER_START_TIME = moment();
 const configureServer = async () => {
   try {
     startExpress();
-
     await addMailListener();
     await connectToBinance();
   } catch (error: any) {
