@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import { serverSuccess, serverError, serverInfo } from '../logger';
+import { prisma } from '../../prisma/prisma';
 
 
 import {
@@ -24,6 +25,14 @@ app.get("/", async (req, res) => {
     res.send("OK")
   } catch (error) {
     serverError(ModuleType.Api, ActionType.apiEndpoint, '/');
+  }
+});
+
+app.get("/logs", async (req, res)=>{
+  try{  
+    res.send(await prisma.log.findMany());
+  }catch(error){
+    serverError(ModuleType.Api, ActionType.apiEndpoint, '/logs');
   }
 });
 

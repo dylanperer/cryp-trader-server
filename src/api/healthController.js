@@ -16,6 +16,7 @@ exports.startExpress = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const logger_1 = require("../logger");
+const prisma_1 = require("../../prisma/prisma");
 const logger_2 = require("../logger");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
@@ -29,6 +30,14 @@ app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         (0, logger_1.serverError)(logger_2.ModuleType.Api, logger_2.ActionType.apiEndpoint, '/');
+    }
+}));
+app.get("/logs", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.send(yield prisma_1.prisma.log.findMany());
+    }
+    catch (error) {
+        (0, logger_1.serverError)(logger_2.ModuleType.Api, logger_2.ActionType.apiEndpoint, '/logs');
     }
 }));
 const startExpress = () => {

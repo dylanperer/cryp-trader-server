@@ -1,0 +1,1 @@
+SELECT * FROM Log WHERE sessionId = "5d3e158d-66ed-46bd-8288-ead3b0fee639";

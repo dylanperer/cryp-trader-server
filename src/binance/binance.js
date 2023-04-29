@@ -33,6 +33,6 @@ const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.connectToBinance = connectToBinance;
 const startTrade = () => {
     //check balance of coin pair
-    //get 
+    //get balance
 };
 exports.startTrade = startTrade;

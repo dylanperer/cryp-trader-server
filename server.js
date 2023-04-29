@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports._SERVER_START_TIME = exports._SESSION_ID = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const healthController_1 = require("./src/api/healthController");
-const mail_1 = require("./src/mail");
 const logger_1 = require("./src/logger");
 const uuid_1 = require("uuid");
 const moment_1 = __importDefault(require("moment"));
@@ -26,7 +25,7 @@ exports._SERVER_START_TIME = (0, moment_1.default)();
 const configureServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         (0, healthController_1.startExpress)();
-        yield (0, mail_1.addMailListener)();
+        // await addMailListener();
         yield (0, binance_1.connectToBinance)();
     }
     catch (error) {
