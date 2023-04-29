@@ -1,5 +1,4 @@
 import express from "express";
-import https from "https";
 import { serverSuccess, serverError, serverInfo } from '../logger';
 import { prisma } from '../../prisma/prisma';
 import * as fs from 'fs';
@@ -12,7 +11,6 @@ import {
   LogType,
   readServerLogFromCsv,
 } from "../logger";
-import path from "path";
 
 const app = express();
 
@@ -39,13 +37,8 @@ app.get("/logs", async (req, res)=>{
 
 export const startExpress = () => {
   const port = process.env.PORT;
-  console.log(path.join(__dirname.replace(`\\src\\api`,''), 'cert', 'key.pem'));
-  const sslSever = https.createServer({
-    key: fs.readFileSync(path.join(__dirname.replace(`\\src\\api`,''), 'cert', 'key.pem')),
-    cert: fs.readFileSync(path.join(__dirname.replace(`\\src\\api`,''), 'cert', 'cert.pem')),
-  }, app);
 
-  sslSever.listen(port, () => {
+  app.listen(port, () => {
     serverSuccess(ModuleType.Api, ActionType.apiStarted, `Port:${port}`);
   });
 
