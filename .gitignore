@@ -4,8 +4,4 @@ dist/
 ssh
 ssh.pub
 prisma/migrations/
-cryp-trader.db
-cryp-trader.db-journal
-cryp-trader.db
-cryp-trader.db-journal
 tt.ppk
