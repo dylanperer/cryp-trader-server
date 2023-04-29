@@ -18,6 +18,7 @@ const mail_listener5_1 = require("mail-listener5");
 const moment_1 = __importDefault(require("moment"));
 const prisma_1 = require("../prisma/prisma");
 const server_1 = require("../server");
+const logger_1 = require("./logger");
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 var TradeSide;
 (function (TradeSide) {
@@ -26,7 +27,7 @@ var TradeSide;
     TradeSide["STOP_LOSS_SHORT"] = "STOP LOSS SHORT";
     TradeSide["STOP_LOSS_LONG"] = "STOP LOSS LONG";
 })(TradeSide = exports.TradeSide || (exports.TradeSide = {}));
-const logger_1 = require("./logger");
+const logger_2 = require("./logger");
 const options = {
     username: "imap-username",
     password: "imap-password",
@@ -44,24 +45,28 @@ const options = {
     fetchUnreadOnStart: true,
     attachments: false, // download attachments as they are encountered to the project directory
 };
-const onMail = (mail, seqno, attributes, startTime, seenUIDs) => __awaiter(void 0, void 0, void 0, function* () {
-    const find = seenUIDs.find((c) => c.subject === mail.subject && c.uid === attributes.uid);
-    if (!find && mail.date > startTime) {
-        const alert = yield parseAlert(mail.subject);
+const onMail = (mail, seqno, attributes, startTime) => __awaiter(void 0, void 0, void 0, function* () {
+    if (mail.date > startTime) {
+        const alert = yield parseAlert(mail.subject, attributes.uid);
         if (alert) {
             const alertStr = `${alert.delay}s, ${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
-            seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
-            (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.onReceiveMail, `${alertStr}`);
+            (0, logger_2.serverInfo)(logger_2.ModuleType.Mail, logger_2.ActionType.onReceiveMail, `${alertStr}`);
         }
     }
 });
 const onError = (error) => __awaiter(void 0, void 0, void 0, function* () {
-    (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.mailError, `${error.toString()}, ${error.message}`);
-    (0, logger_1.serverInfo)(logger_1.ModuleType.Mail, logger_1.ActionType.mailRestart, `restarting, attempts remaining ${_MAIL_LISTENER_REFRESH_ATTEMPTS}...`);
+    (0, logger_2.serverError)(logger_2.ModuleType.Mail, logger_2.ActionType.mailError, `${error.toString()}, ${error.message}`);
+    (0, logger_2.serverInfo)(logger_2.ModuleType.Mail, logger_2.ActionType.mailRestart, `restarting, attempts remaining ${_MAIL_LISTENER_REFRESH_ATTEMPTS}...`);
     _MAIL_LISTENER_REFRESH_ATTEMPTS -= 1;
     (0, exports.addMailListener)();
 });
-const parseAlert = (subject) => __awaiter(void 0, void 0, void 0, function* () {
+const isAlertExist = (uid) => __awaiter(void 0, void 0, void 0, function* () {
+    const alert = yield prisma_1.prisma.alert.findUnique({
+        where: { uid },
+    });
+    return alert ? true : false;
+});
+const parseAlert = (subject, uid) => __awaiter(void 0, void 0, void 0, function* () {
     //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
     try {
         const split = subject.split(",");
@@ -69,7 +74,7 @@ const parseAlert = (subject) => __awaiter(void 0, void 0, void 0, function* () {
         const side = split[1].trim().toUpperCase();
         const coin = split[2].replace("buy", "").trim();
         const price = Number(split[3]);
-        console.log(receivedAt, side, coin, price);
+        // console.log(receivedAt, side, coin, price);
         if (subject.toLowerCase().includes("alert")) {
             if (!receivedAt || !side || !price) {
                 throw new Error("Alert parsing failed");
@@ -77,19 +82,29 @@ const parseAlert = (subject) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const delay = new Date().getTime() - receivedAt.getTime();
         const diffInSeconds = Math.floor(delay / 1000);
-        console.log(new Date().getTime(), receivedAt.getTime());
-        return yield prisma_1.prisma.alert.create({
-            data: {
-                coin: coin,
-                side: side,
-                price: price,
-                receivedAt: receivedAt,
-                delay: diffInSeconds,
-            },
-        });
+        const exists = yield isAlertExist(uid);
+        if (!exists) {
+            return yield prisma_1.prisma.alert.create({
+                data: {
+                    uid: uid,
+                    coin: coin,
+                    side: side,
+                    price: price,
+                    receivedAt: receivedAt,
+                    delay: diffInSeconds,
+                },
+            });
+        }
+        else {
+            (0, logger_1.serverWarn)(logger_2.ModuleType.Mail, logger_2.ActionType.alertParse, `Already exists uid:${uid} Subject:${subject}`);
+        }
     }
     catch (error) {
-        (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.alertParse, `${error.message}`);
+        if (error.message === `Cannot read properties of undefined (reading 'trim')`) {
+            (0, logger_1.serverWarn)(logger_2.ModuleType.Mail, logger_2.ActionType.alertParse, `Not an alert, received: ${uid}, ${subject}`);
+            return;
+        }
+        (0, logger_2.serverError)(logger_2.ModuleType.Mail, logger_2.ActionType.alertParse, `uid:${uid} Subject:${subject}, error:${error.message}`);
     }
 });
 const getDelay = (t1, t2) => {
@@ -108,7 +123,6 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
         if (_MAIL_LISTENER_REFRESH_ATTEMPTS === 0) {
             throw new Error("Mail listener failed to restart");
         }
-        const seenUIDs = [];
         const mailListener = new mail_listener5_1.MailListener(Object.assign(Object.assign({}, options), { username: email, password: password }));
         // Start
         mailListener.start();
@@ -116,15 +130,15 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
         mailListener.on("error", onError);
         mailListener.on("server:connected", () => {
             mailListener.on("mail", (mail, seqno, attributes) => {
-                onMail(mail, seqno, attributes, server_1._SERVER_START_TIME.toDate(), seenUIDs);
+                onMail(mail, seqno, attributes, server_1._SERVER_START_TIME.toDate());
             });
-            (0, logger_1.serverSuccess)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener);
+            (0, logger_2.serverSuccess)(logger_2.ModuleType.Mail, logger_2.ActionType.addMailListener);
         });
         return mailListener;
         // Simple example of how to get all attachments from an email
     }
     catch (error) {
-        (0, logger_1.serverError)(logger_1.ModuleType.Mail, logger_1.ActionType.addMailListener, `${error.message}`);
+        (0, logger_2.serverError)(logger_2.ModuleType.Mail, logger_2.ActionType.addMailListener, `${error.message}`);
         process.exit(1);
     }
 });

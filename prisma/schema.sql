@@ -17,6 +17,7 @@ CREATE TABLE Log
 CREATE TABLE Alert
 (
     id         INTEGER      NOT NULL PRIMARY KEY AUTOINCREMENT,
+    uid       INTEGER      NOT NULL UNIQUE,
     coin       VARCHAR(255) NOT NULL,
     side       VARCHAR(10)  NOT NULL,
     price      REAL         NOT NULL,
@@ -37,5 +38,7 @@ CREATE TABLE Trade
     FOREIGN KEY (entryAlertId) REFERENCES Alert (id),
     FOREIGN KEY (exitAlterId) REFERENCES Alert (id)
 );
+
+
 
 

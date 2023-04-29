@@ -9,6 +9,7 @@ datasource db {
 
 model Alert {
   id                              Int      @id @default(autoincrement())
+  uid                             Int      @unique(map: "sqlite_autoindex_Alert_1")
   coin                            String
   side                            String
   price                           Float

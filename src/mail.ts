@@ -3,6 +3,7 @@ import { MailListener } from "mail-listener5";
 import moment from "moment";
 import { prisma } from "../prisma/prisma";
 import { _SERVER_START_TIME } from "../server";
+import { serverWarn } from "./logger";
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 
 export enum TradeSide {
@@ -44,18 +45,13 @@ const onMail = async (
   seqno: any,
   attributes: any,
   startTime: Date,
-  seenUIDs: Array<{ uid: number; subject: string }>
 ) => {
-  const find = seenUIDs.find(
-    (c) => c.subject === mail.subject && c.uid === attributes.uid
-  );
 
-  if (!find && mail.date > startTime) {
-    const alert = await parseAlert(mail.subject);
+  if (mail.date > startTime) {
+    const alert = await parseAlert(mail.subject, attributes.uid);
     if (alert) {
       const alertStr = `${alert.delay}s, ${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
 
-      seenUIDs.push({ uid: attributes.uid, subject: mail.subject });
       serverInfo(ModuleType.Mail, ActionType.onReceiveMail, `${alertStr}`);
     }
   }
@@ -79,7 +75,13 @@ const onError = async (error: any) => {
   addMailListener();
 };
 
-const parseAlert = async (subject: string) => {
+const isAlertExist = async (uid: number): Promise<boolean> => {
+  const alert = await prisma.alert.findUnique({
+    where: { uid },
+  });
+  return alert? true: false;
+};
+const parseAlert = async (subject: string, uid: number) => {
   //Alert: 2023-04-27T06:14:00Z,LONG,buy ETHUSDT.P,1898.54,0.03
   try {
     const split = subject.split(",");
@@ -89,7 +91,7 @@ const parseAlert = async (subject: string) => {
     const coin = split[2].replace("buy", "").trim();
     const price = Number(split[3]);
 
-    console.log(receivedAt, side, coin, price);
+    // console.log(receivedAt, side, coin, price);
 
     if (subject.toLowerCase().includes("alert")) {
       if (!receivedAt || !side || !price) {
@@ -100,18 +102,40 @@ const parseAlert = async (subject: string) => {
     const delay = new Date().getTime() - receivedAt.getTime();
     const diffInSeconds = Math.floor(delay / 1000);
 
-    console.log(new Date().getTime(), receivedAt.getTime());
-    return await prisma.alert.create({
-      data: {
-        coin: coin,
-        side: side,
-        price: price,
-        receivedAt: receivedAt,
-        delay: diffInSeconds,
-      },
-    });
+    const exists = await isAlertExist(uid);
+
+    if(!exists){
+      return await prisma.alert.create({
+        data: {
+          uid: uid,
+          coin: coin,
+          side: side,
+          price: price,
+          receivedAt: receivedAt,
+          delay: diffInSeconds,
+        },
+      });
+    } else {
+      serverWarn(
+        ModuleType.Mail,
+        ActionType.alertParse,
+        `Already exists uid:${uid} Subject:${subject}`
+      );
+    }
   } catch (error: any) {
-    serverError(ModuleType.Mail, ActionType.alertParse, `${error.message}`);
+    if(error.message === `Cannot read properties of undefined (reading 'trim')`){
+      serverWarn(
+        ModuleType.Mail,
+        ActionType.alertParse,
+        `Not an alert, received: ${uid}, ${subject}`
+      );
+      return;
+    }
+    serverError(
+      ModuleType.Mail,
+      ActionType.alertParse,
+      `uid:${uid} Subject:${subject}, error:${error.message}`
+    );
   }
 };
 
@@ -134,8 +158,6 @@ export const addMailListener = async () => {
       throw new Error("Mail listener failed to restart");
     }
 
-    const seenUIDs: Array<{ uid: number; subject: string }> = [];
-
     const mailListener = new MailListener({
       ...options,
       username: email,
@@ -150,7 +172,7 @@ export const addMailListener = async () => {
 
     mailListener.on("server:connected", () => {
       mailListener.on("mail", (mail: any, seqno: any, attributes: any) => {
-        onMail(mail, seqno, attributes, _SERVER_START_TIME.toDate(), seenUIDs);
+        onMail(mail, seqno, attributes, _SERVER_START_TIME.toDate());
       });
       serverSuccess(ModuleType.Mail, ActionType.addMailListener);
     });
@@ -166,10 +188,8 @@ export const addMailListener = async () => {
     );
     process.exit(1);
   }
-  
 };
 
-
-export const attachMailListener = async ()=>{
+export const attachMailListener = async () => {
   const m = await addMailListener();
-}
+};
