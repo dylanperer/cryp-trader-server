@@ -48,7 +48,6 @@ const moment_1 = __importDefault(require("moment"));
 const fs = __importStar(require("fs"));
 const csv_parse_1 = require("csv-parse");
 const prisma_1 = require("../prisma/prisma");
-const server_1 = require("../server");
 var ModuleType;
 (function (ModuleType) {
     ModuleType["Mail"] = "Mail";
@@ -159,17 +158,21 @@ const Log = (module, action, context, logLevel) => {
 const buildLogStr = (module, action, logLevel, context) => {
     const formattedTime = (0, moment_1.default)(new Date()).format("DD/MM/YYYY h:mm:ss");
     const str = `${formattedTime} [${module.toString()}] [${action.toString()}] ${context ? context.concat(".") : ""}`;
-    prisma_1.prisma.log
-        .create({
-        data: {
-            sessionId: server_1._SESSION_ID,
-            module: module.toString(),
-            action: action.toString(),
-            logLevel: (logLevel === null || logLevel === void 0 ? void 0 : logLevel.toString()) || LogType.info.toString(),
-            context: context,
-        },
-    })
-        .then();
+    (0, prisma_1.getActiveSession)().then((session) => {
+        if (session) {
+            prisma_1.prisma.log
+                .create({
+                data: {
+                    sessionId: session.id,
+                    module: module.toString(),
+                    action: action.toString(),
+                    logLevel: (logLevel === null || logLevel === void 0 ? void 0 : logLevel.toString()) || LogType.info.toString(),
+                    context: context,
+                },
+            })
+                .then();
+        }
+    });
     return str;
 };
 const serverError = (module, action, context) => {

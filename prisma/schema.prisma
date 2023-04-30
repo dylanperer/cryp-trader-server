@@ -22,12 +22,13 @@ model Alert {
 
 model Log {
   id        Int      @id @default(autoincrement())
-  sessionId String
+  sessionId Int
   module    String
   action    String
   logLevel  String
   context   String?
   createdAt DateTime @default(now())
+  Session   Session  @relation(fields: [sessionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model Trade {
@@ -39,4 +40,12 @@ model Trade {
   createdAt                       DateTime @default(now())
   Alert_Trade_exitAlterIdToAlert  Alert?   @relation("Trade_exitAlterIdToAlert", fields: [exitAlterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Alert_Trade_entryAlertIdToAlert Alert    @relation("Trade_entryAlertIdToAlert", fields: [entryAlertId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Session {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  hasEnded  String
+  endAt     DateTime?
+  Log       Log[]
 }

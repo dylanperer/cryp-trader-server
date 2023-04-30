@@ -1,8 +1,7 @@
 //@ts-ignore
 import { MailListener } from "mail-listener5";
 import moment from "moment";
-import { prisma } from "../prisma/prisma";
-import { _SERVER_START_TIME } from "../server";
+import { prisma, getActiveSession } from '../prisma/prisma';
 import { serverWarn } from "./logger";
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 
@@ -44,10 +43,9 @@ const onMail = async (
   mail: any,
   seqno: any,
   attributes: any,
-  startTime: Date,
 ) => {
-
-  if (mail.date > startTime) {
+  const session = await getActiveSession()
+  if (session && mail.date > session.createdAt) {
     const alert = await parseAlert(mail.subject, attributes.uid);
     if (alert) {
       const alertStr = `${alert.delay}s, ${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
@@ -172,7 +170,7 @@ export const addMailListener = async () => {
 
     mailListener.on("server:connected", () => {
       mailListener.on("mail", (mail: any, seqno: any, attributes: any) => {
-        onMail(mail, seqno, attributes, _SERVER_START_TIME.toDate());
+        onMail(mail, seqno, attributes);
       });
       serverSuccess(ModuleType.Mail, ActionType.addMailListener);
     });
@@ -190,6 +188,4 @@ export const addMailListener = async () => {
   }
 };
 
-export const attachMailListener = async () => {
-  const m = await addMailListener();
-};
+

@@ -12,12 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.attachMailListener = exports.addMailListener = exports.getDelay = exports.TradeSide = void 0;
+exports.addMailListener = exports.getDelay = exports.TradeSide = void 0;
 //@ts-ignore
 const mail_listener5_1 = require("mail-listener5");
 const moment_1 = __importDefault(require("moment"));
 const prisma_1 = require("../prisma/prisma");
-const server_1 = require("../server");
 const logger_1 = require("./logger");
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 var TradeSide;
@@ -45,8 +44,9 @@ const options = {
     fetchUnreadOnStart: true,
     attachments: false, // download attachments as they are encountered to the project directory
 };
-const onMail = (mail, seqno, attributes, startTime) => __awaiter(void 0, void 0, void 0, function* () {
-    if (mail.date > startTime) {
+const onMail = (mail, seqno, attributes) => __awaiter(void 0, void 0, void 0, function* () {
+    const session = yield (0, prisma_1.getActiveSession)();
+    if (session && mail.date > session.createdAt) {
         const alert = yield parseAlert(mail.subject, attributes.uid);
         if (alert) {
             const alertStr = `${alert.delay}s, ${alert.receivedAt}, ${alert.side}, ${alert.coin}, ${alert.price}`;
@@ -130,7 +130,7 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
         mailListener.on("error", onError);
         mailListener.on("server:connected", () => {
             mailListener.on("mail", (mail, seqno, attributes) => {
-                onMail(mail, seqno, attributes, server_1._SERVER_START_TIME.toDate());
+                onMail(mail, seqno, attributes);
             });
             (0, logger_2.serverSuccess)(logger_2.ModuleType.Mail, logger_2.ActionType.addMailListener);
         });
@@ -143,7 +143,3 @@ const addMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.addMailListener = addMailListener;
-const attachMailListener = () => __awaiter(void 0, void 0, void 0, function* () {
-    const m = yield (0, exports.addMailListener)();
-});
-exports.attachMailListener = attachMailListener;

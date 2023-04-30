@@ -3,8 +3,7 @@ import moment from "moment";
 import * as fs from "fs";
 import * as path from "path";
 import { parse } from "csv-parse";
-import { prisma } from "../prisma/prisma";
-import { _SESSION_ID } from '../server';
+import { getActiveSession, prisma } from "../prisma/prisma";
 
 export enum ModuleType {
   Mail = "Mail",
@@ -20,7 +19,7 @@ export enum ActionType {
   mailError = "Mail error",
   mailRestart = "Restarting listener",
   mailRefresh = "Restarting refresh",
-  alertParse = 'Parsing alert',
+  alertParse = "Parsing alert",
 
   serverStart = "String server",
   serverError = "Server error",
@@ -31,9 +30,9 @@ export enum ActionType {
 
   connectDatabase = "Connecting to database",
   databaseError = "Database error",
-  databaseInsert = 'Inserting into database',
+  databaseInsert = "Inserting into database",
 
-  connectBinance = 'Connecting to binance'
+  connectBinance = "Connecting to binance",
 }
 
 export enum LogType {
@@ -134,17 +133,21 @@ const buildLogStr = (
     context ? context.concat(".") : ""
   }`;
 
-  prisma.log
-    .create({
-      data: {
-        sessionId: _SESSION_ID,
-        module: module.toString(),
-        action: action.toString(),
-        logLevel: logLevel?.toString() || LogType.info.toString(),
-        context: context,
-      },
-    })
-    .then();
+  getActiveSession().then((session) => {
+    if (session) {
+      prisma.log
+        .create({
+          data: {
+            sessionId: session.id,
+            module: module.toString(),
+            action: action.toString(),
+            logLevel: logLevel?.toString() || LogType.info.toString(),
+            context: context,
+          },
+        })
+        .then();
+    }
+  });
 
   return str;
 };
