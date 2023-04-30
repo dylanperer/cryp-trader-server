@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "dev": "tsc && node server.js",
+    "dev": "nodemon",
     "update": "git fetch && git reset --hard origin/master && yarn install && tsc && prisma db pull && prisma generate",
     "prod": "node server.js",
     "prisma-db": "prisma db pull && prisma generate",

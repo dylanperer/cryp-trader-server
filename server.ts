@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
-import { startExpress } from "./src/api/healthController";
 import { addMailListener, getDelay } from "./src/mail";
 import { serverError, ModuleType, ActionType, serverInfo } from "./src/logger";
 import { prisma, endPreviousSession, createSession } from "./prisma/prisma";
 import { v4 } from "uuid";
 import moment from "moment";
 import { connectToBinance } from "./src/binance/binance";
+import { startExpress } from "./src/api";
 dotenv.config();
 
 const configureServer = async () => {

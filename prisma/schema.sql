@@ -14,6 +14,7 @@ CREATE TABLE Session
 CREATE TABLE Log
 (
     id        INTEGER      NOT NULL PRIMARY KEY AUTOINCREMENT,
+
     sessionId INTEGER      NOT NULL,
     module    VARCHAR(255) NOT NULL,
     action    VARCHAR(255) NOT NULL,
@@ -50,5 +51,7 @@ CREATE TABLE Trade
 );
 
 
+
+SELECT * FROM Log GROUP BY sessionId;
 
 

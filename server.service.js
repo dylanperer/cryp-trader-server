@@ -13,22 +13,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
+const healthController_1 = require("./src/api/healthController");
 const mail_1 = require("./src/mail");
-const logger_1 = require("./src/logger");
+const logger_service_1 = require("./src/logger.service");
 const prisma_1 = require("./prisma/prisma");
 const binance_1 = require("./src/binance/binance");
-const api_1 = require("./src/api");
 dotenv_1.default.config();
 const configureServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, prisma_1.endPreviousSession)();
         yield (0, prisma_1.createSession)();
-        (0, api_1.startExpress)();
+        (0, healthController_1.startExpress)();
         yield (0, mail_1.addMailListener)();
         yield (0, binance_1.connectToBinance)();
     }
     catch (error) {
-        (0, logger_1.serverError)(logger_1.ModuleType.Server, logger_1.ActionType.serverStart, `${error.message}`);
+        (0, logger_service_1.serverError)(logger_service_1.ModuleType.Server, logger_service_1.ActionType.serverStart, `${error.message}`);
     }
 });
 const main = () => __awaiter(void 0, void 0, void 0, function* () {

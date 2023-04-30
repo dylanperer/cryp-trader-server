@@ -1,45 +1,35 @@
 import express from "express";
 import { serverSuccess, serverError, serverInfo } from '../logger';
-import { prisma } from '../../prisma/prisma';
-import * as fs from 'fs';
-
+import { archivedLogs, liveSessionLogs } from './log';
 
 import {
-  IServerLog,
   ModuleType,
   ActionType,
-  LogType,
-  readServerLogFromCsv,
 } from "../logger";
 
-const app = express();
+export const expressApp = express();
 
-app.use((req, res, next) => {
+expressApp.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 });
 
-app.get("/", async (req, res) => {
+expressApp.get("/", async (req, res) => {
   try {
-    res.send("OK")
+    res.status(200).send("live")
   } catch (error) {
     serverError(ModuleType.Api, ActionType.apiEndpoint, '/');
-  }
-});
-
-app.get("/logs", async (req, res)=>{
-  try{  
-    res.send(await prisma.log.findMany());
-  }catch(error){
-    serverError(ModuleType.Api, ActionType.apiEndpoint, '/logs');
   }
 });
 
 export const startExpress = () => {
   const port = process.env.PORT;
 
-  app.listen(port, () => {
+  expressApp.listen(port, () => {
     serverSuccess(ModuleType.Api, ActionType.apiStarted, `Port:${port}`);
   });
-
 };
+
+
+archivedLogs(expressApp);
+liveSessionLogs(expressApp);
