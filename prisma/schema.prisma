@@ -37,6 +37,7 @@ model Trade {
   side                            String
   market                          String
   margin                          Float?
+  status                          String
   entryAlertId                    Int
   entryAlertPrice                 Float?
   entryActualPrice                Float?

@@ -13,3 +13,8 @@ export enum TradeSide {
 export enum Market {
   Futures = "Futures",
 }
+
+export enum TradeStatus {
+  Active = "Active",
+  Complete = "Complete",
+}

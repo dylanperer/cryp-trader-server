@@ -47,6 +47,7 @@ CREATE TABLE Trade
     market             VARCHAR(50) NOT NULL,
     margin             REAL,
 
+    status             VARCHAR(50) NOT NULL,
     entryAlertId       INT         NOT NULL,
     entryAlertPrice    REAL,
     entryActualPrice   REAL,

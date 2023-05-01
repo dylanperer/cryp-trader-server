@@ -8,7 +8,7 @@ import {
   serverWarn,
 } from "../logger";
 import { prisma } from "../../prisma/prisma";
-import { AlertAction, TradeSide, Market } from "../../constants";
+import { AlertAction, TradeSide, Market, TradeStatus } from "../../constants";
 import { Alert, Trade } from "@prisma/client";
 
 export const connectToBinance = async () => {
@@ -47,6 +47,18 @@ const getCoinAsset = async (client: USDMClient) => {
 
 export const createTrade = async (client: USDMClient, entryAlert: Alert): Promise<Trade| null> => {
   try {
+    //check for still active trades
+    const activeTrade = await prisma.trade.findFirst({where: {status: TradeStatus.Active}});
+    if(activeTrade){
+      serverWarn(
+        ModuleType.Binance,
+        ActionType.createTrade,
+        `trade [${activeTrade.id}] is still active. New trade is discarded.`
+      );
+      return null;
+    }
+
+    //get trade settings
     const tradSettings = getTradeSettings();
     if (!tradSettings) {
       throw new Error("Invalid trade settings. Unable to create trade.")
@@ -78,6 +90,7 @@ export const createTrade = async (client: USDMClient, entryAlert: Alert): Promis
         market: market,
         coin: coin,
         side: side.toString(),
+        status: TradeStatus.Active,
         margin: Number(margin),
         entryAlertId: entryAlert.id,
         entryAlertPrice: entryAlert.price,
@@ -88,13 +101,15 @@ export const createTrade = async (client: USDMClient, entryAlert: Alert): Promis
     return trade;
   } catch (error: any) {
     serverError(ModuleType.Binance, ActionType.createTrade, error.message);
-  }finally{
     return null;
   }
-};
+}
+export const placeOrder = async (client: USDMClient, entryAlert: Alert)=>{
+  const trade = await createTrade(client, entryAlert);
 
-export const placeOrder = async ()=>{
-  
+  if(trade){
+    
+  }
 }
 
 interface ITradeSettings {
@@ -102,6 +117,7 @@ interface ITradeSettings {
   coin: string;
   margin: string;
 }
+
 export const getTradeSettings = (): ITradeSettings | null => {
   const market = process.env.MARKET;
   const coin = process.env.COIN;
