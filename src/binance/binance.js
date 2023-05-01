@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.startTrade = exports.connectToBinance = void 0;
+exports.getCoinAsset = exports.connectToBinance = void 0;
 const binance_1 = require("binance");
 const logger_1 = require("../logger");
-const _COIN = "USDT";
+const tradeSettings_1 = require("./tradeSettings");
+const enterTrade_1 = require("./enterTrade");
 const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
     const apiKey = process.env.BINANCE_API_KEY;
     const apiSecret = process.env.BINANCE_SECRET_KEY;
@@ -24,21 +25,23 @@ const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
             api_key: apiKey,
             api_secret: apiSecret,
         });
-        const asset = yield getAsset(client, _COIN);
-        (0, logger_1.serverSuccess)(logger_1.ModuleType.Binance, logger_1.ActionType.connectBinance, `coin: ${asset === null || asset === void 0 ? void 0 : asset.asset} ballance ${asset === null || asset === void 0 ? void 0 : asset.availableBalance}`);
+        (0, tradeSettings_1.getTradeSettings)();
+        const coinAsset = yield (0, exports.getCoinAsset)(client);
+        setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
+            //@ts-ignore
+            yield (0, enterTrade_1.findLowestAsk)(client, { symbol: 'ETHBUSD' });
+        }), 3000);
+        (0, logger_1.serverSuccess)(logger_1.ModuleType.Binance, logger_1.ActionType.connectBinance, `coin: ${coinAsset === null || coinAsset === void 0 ? void 0 : coinAsset.asset} ballance ${coinAsset === null || coinAsset === void 0 ? void 0 : coinAsset.availableBalance}`);
     }
     catch (e) {
         (0, logger_1.serverError)(logger_1.ModuleType.Binance, logger_1.ActionType.connectBinance, e.message);
     }
 });
 exports.connectToBinance = connectToBinance;
-const getAsset = (client, coin) => __awaiter(void 0, void 0, void 0, function* () {
+const getCoinAsset = (client) => __awaiter(void 0, void 0, void 0, function* () {
+    const coin = process.env.BASE_COIN;
     const info = yield client.getAccountInformation();
-    const asset = info.assets.find(c => c.asset === coin);
-    return asset;
+    const coinAsset = info.assets.find((c) => c.asset === coin);
+    return coinAsset;
 });
-const startTrade = (client, side, entry) => {
-    //check balance of coin pair
-    //get balance
-};
-exports.startTrade = startTrade;
+exports.getCoinAsset = getCoinAsset;

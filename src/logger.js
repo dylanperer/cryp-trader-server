@@ -73,6 +73,9 @@ var ActionType;
     ActionType["databaseError"] = "Database error";
     ActionType["databaseInsert"] = "Inserting into database";
     ActionType["connectBinance"] = "Connecting to binance";
+    ActionType["tradeConfiguration"] = "Configuring trade settings";
+    ActionType["createTrade"] = "Create trade";
+    ActionType["placeOrder"] = "Place order";
 })(ActionType = exports.ActionType || (exports.ActionType = {}));
 var LogType;
 (function (LogType) {

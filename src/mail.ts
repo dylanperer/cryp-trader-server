@@ -109,13 +109,14 @@ const parseAlert = async (subject: string, uid: number) => {
           delay: diffInSeconds,
         },
       });
-    } else {
-      serverWarn(
-        ModuleType.Mail,
-        ActionType.alertParse,
-        `Already exists uid:${uid} Subject:${subject}`
-      );
-    }
+    } 
+    // else {
+    //   serverWarn(
+    //     ModuleType.Mail,
+    //     ActionType.alertParse,
+    //     `Already exists uid:${uid} Subject:${subject}`
+    //   );
+    // }
   } catch (error: any) {
     if(error.message === `Cannot read properties of undefined (reading 'trim')`){
       serverWarn(

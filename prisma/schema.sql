@@ -42,7 +42,9 @@ CREATE TABLE Trade
 (
     id                 INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT,
 
-    coin               TEXT        NOT NULL,
+    baseCoin           TEXT        NOT NULL,
+    symbol             TEXT        NOT NULL,
+
     side               VARCHAR(10) NOT NULL,
     market             VARCHAR(50) NOT NULL,
     margin             REAL,

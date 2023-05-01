@@ -17,4 +17,6 @@ export enum Market {
 export enum TradeStatus {
   Active = "Active",
   Complete = "Complete",
+  Unsuccessful = "Unsuccessful",
+  Processing = 'Processing'
 }

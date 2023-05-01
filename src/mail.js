@@ -12,20 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMailListener = exports.getDelay = exports.TradeSide = void 0;
+exports.addMailListener = exports.getDelay = void 0;
 //@ts-ignore
 const mail_listener5_1 = require("mail-listener5");
 const moment_1 = __importDefault(require("moment"));
 const prisma_1 = require("../prisma/prisma");
 const logger_1 = require("./logger");
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
-var TradeSide;
-(function (TradeSide) {
-    TradeSide["LONG"] = "LONG";
-    TradeSide["SHORT"] = "SHORT";
-    TradeSide["STOP_LOSS_SHORT"] = "STOP LOSS SHORT";
-    TradeSide["STOP_LOSS_LONG"] = "STOP LOSS LONG";
-})(TradeSide = exports.TradeSide || (exports.TradeSide = {}));
 const logger_2 = require("./logger");
 const options = {
     username: "imap-username",
@@ -95,9 +88,13 @@ const parseAlert = (subject, uid) => __awaiter(void 0, void 0, void 0, function*
                 },
             });
         }
-        else {
-            (0, logger_1.serverWarn)(logger_2.ModuleType.Mail, logger_2.ActionType.alertParse, `Already exists uid:${uid} Subject:${subject}`);
-        }
+        // else {
+        //   serverWarn(
+        //     ModuleType.Mail,
+        //     ActionType.alertParse,
+        //     `Already exists uid:${uid} Subject:${subject}`
+        //   );
+        // }
     }
     catch (error) {
         if (error.message === `Cannot read properties of undefined (reading 'trim')`) {

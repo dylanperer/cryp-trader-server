@@ -13,7 +13,7 @@ const configureServer = async () => {
     await endPreviousSession();
     await createSession();
 
-    startExpress();
+    // startExpress();
     // await addMailListener();
     await connectToBinance();
   } catch (error: any) {

@@ -33,7 +33,8 @@ model Log {
 
 model Trade {
   id                              Int       @id @default(autoincrement())
-  coin                            String
+  baseCoin                        String
+  symbol                          String
   side                            String
   market                          String
   margin                          Float?
