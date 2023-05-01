@@ -16,7 +16,7 @@ model Alert {
   receivedAt                      DateTime
   createdAt                       DateTime @default(now())
   delay                           Int
-  Trade_Trade_exitAlterIdToAlert  Trade[]  @relation("Trade_exitAlterIdToAlert")
+  Trade_Trade_exitAlertIdToAlert  Trade[]  @relation("Trade_exitAlertIdToAlert")
   Trade_Trade_entryAlertIdToAlert Trade[]  @relation("Trade_entryAlertIdToAlert")
 }
 
@@ -32,14 +32,27 @@ model Log {
 }
 
 model Trade {
-  id                              Int      @id @default(autoincrement())
+  id                              Int       @id @default(autoincrement())
+  coin                            String
   side                            String
-  entryPrice                      Float
+  market                          String
+  margin                          Float?
   entryAlertId                    Int
-  exitAlterId                     Int?
-  createdAt                       DateTime @default(now())
-  Alert_Trade_exitAlterIdToAlert  Alert?   @relation("Trade_exitAlterIdToAlert", fields: [exitAlterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Alert_Trade_entryAlertIdToAlert Alert    @relation("Trade_entryAlertIdToAlert", fields: [entryAlertId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  entryAlertPrice                 Float?
+  entryActualPrice                Float?
+  entryTradeFee                   Float?
+  exitAlertId                     Int?
+  exitAlertPrice                  Float?
+  exitActualPrice                 Float?
+  exitFee                         Float?
+  entryWalletBalance              Float?
+  exitWalletBalance               Float?
+  profit                          Float?
+  actualProfit                    Float?
+  createdAt                       DateTime  @default(now())
+  Funding                         Funding[]
+  Alert_Trade_exitAlertIdToAlert  Alert?    @relation("Trade_exitAlertIdToAlert", fields: [exitAlertId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Alert_Trade_entryAlertIdToAlert Alert     @relation("Trade_entryAlertIdToAlert", fields: [entryAlertId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model Session {
@@ -48,4 +61,12 @@ model Session {
   hasEnded  String
   endAt     DateTime?
   Log       Log[]
+}
+
+model Funding {
+  id        Int      @id @default(autoincrement())
+  tradeId   Int
+  rate      Float?
+  createdAt DateTime @default(now())
+  Trade     Trade    @relation(fields: [tradeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

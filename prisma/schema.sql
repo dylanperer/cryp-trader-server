@@ -2,12 +2,13 @@ DROP TABLE IF EXISTS Session;
 DROP TABLE IF EXISTS Alert;
 DROP TABLE IF EXISTS Log;
 DROP TABLE IF EXISTS Trade;
+DROP TABLE IF EXISTS Funding;
 
 CREATE TABLE Session
 (
     id        INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    hasEnded  TEXT NOT NULL CHECK (hasEnded IN ('true', 'false')),
+    hasEnded  TEXT     NOT NULL CHECK (hasEnded IN ('true', 'false')),
     endAt     DATETIME
 );
 
@@ -39,19 +40,45 @@ CREATE TABLE Alert
 
 CREATE TABLE Trade
 (
-    id           INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT,
-    side         VARCHAR(10) NOT NULL,
-    entryPrice   REAL        NOT NULL,
-    entryAlertId INT         NOT NULL,
-    exitAlterId  INT,
-    createdAt    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id                 INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT,
+
+    coin               TEXT        NOT NULL,
+    side               VARCHAR(10) NOT NULL,
+    market             VARCHAR(50) NOT NULL,
+    margin             REAL,
+
+    entryAlertId       INT         NOT NULL,
+    entryAlertPrice    REAL,
+    entryActualPrice   REAL,
+    entryTradeFee      REAL,
+
+    exitAlertId        INT,
+    exitAlertPrice     REAL,
+    exitActualPrice    REAL,
+    exitFee            REAL,
+
+    entryWalletBalance REAL,
+    exitWalletBalance  REAL,
+
+    profit             REAL,
+    actualProfit       REAL,
+
+    createdAt          DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (entryAlertId) REFERENCES Alert (id),
-    FOREIGN KEY (exitAlterId) REFERENCES Alert (id)
+    FOREIGN KEY (exitAlertId) REFERENCES Alert (id)
 );
 
+CREATE TABLE Funding
+(
+    id        INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
+    tradeId   INTEGER  NOT NULL,
+    rate      REAL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 
-SELECT * FROM Log GROUP BY sessionId;
+    FOREIGN KEY (tradeId) REFERENCES Trade (id)
+);
+
 
 

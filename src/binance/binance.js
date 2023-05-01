@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.startTrade = exports.connectToBinance = void 0;
 const binance_1 = require("binance");
 const logger_1 = require("../logger");
+const _COIN = "USDT";
 const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
     const apiKey = process.env.BINANCE_API_KEY;
     const apiSecret = process.env.BINANCE_SECRET_KEY;
@@ -19,19 +20,24 @@ const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!apiKey || !apiSecret) {
             throw new Error(`Invalid api or secret key`);
         }
-        const client = new binance_1.MainClient({
+        const client = new binance_1.USDMClient({
             api_key: apiKey,
             api_secret: apiSecret,
         });
-        const status = yield client.getAccountStatus();
-        (0, logger_1.serverSuccess)(logger_1.ModuleType.Binance, logger_1.ActionType.connectBinance, `status ${status.data}`);
+        const asset = yield getAsset(client, _COIN);
+        (0, logger_1.serverSuccess)(logger_1.ModuleType.Binance, logger_1.ActionType.connectBinance, `coin: ${asset === null || asset === void 0 ? void 0 : asset.asset} ballance ${asset === null || asset === void 0 ? void 0 : asset.availableBalance}`);
     }
     catch (e) {
         (0, logger_1.serverError)(logger_1.ModuleType.Binance, logger_1.ActionType.connectBinance, e.message);
     }
 });
 exports.connectToBinance = connectToBinance;
-const startTrade = () => {
+const getAsset = (client, coin) => __awaiter(void 0, void 0, void 0, function* () {
+    const info = yield client.getAccountInformation();
+    const asset = info.assets.find(c => c.asset === coin);
+    return asset;
+});
+const startTrade = (client, side, entry) => {
     //check balance of coin pair
     //get balance
 };

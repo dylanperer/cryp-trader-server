@@ -14,7 +14,7 @@ const configureServer = async () => {
     await createSession();
 
     startExpress();
-    await addMailListener();
+    // await addMailListener();
     await connectToBinance();
   } catch (error: any) {
     serverError(ModuleType.Server, ActionType.serverStart, `${error.message}`);

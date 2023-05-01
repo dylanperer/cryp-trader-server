@@ -5,12 +5,7 @@ import { prisma, getActiveSession } from '../prisma/prisma';
 import { serverWarn } from "./logger";
 let _MAIL_LISTENER_REFRESH_ATTEMPTS = 2;
 
-export enum TradeSide {
-  LONG = "LONG",
-  SHORT = "SHORT",
-  STOP_LOSS_SHORT = "STOP LOSS SHORT",
-  STOP_LOSS_LONG = "STOP LOSS LONG",
-}
+
 
 import {
   LogType,
@@ -20,6 +15,7 @@ import {
   serverError,
   serverSuccess,
 } from "./logger";
+import { AlertAction } from "../constants";
 
 const options = {
   username: "imap-username",
@@ -85,7 +81,7 @@ const parseAlert = async (subject: string, uid: number) => {
     const split = subject.split(",");
 
     const receivedAt = new Date(split[0].replace("Alert:", "").trim());
-    const side = split[1].trim().toUpperCase() as TradeSide;
+    const side = split[1].trim().toUpperCase() as AlertAction;
     const coin = split[2].replace("buy", "").trim();
     const price = Number(split[3]);
 

@@ -33,6 +33,9 @@ export enum ActionType {
   databaseInsert = "Inserting into database",
 
   connectBinance = "Connecting to binance",
+  tradeConfiguration = 'Configuring trade settings',
+  createTrade = 'Create trade',
+  placeOrder = 'Place order',
 }
 
 export enum LogType {
