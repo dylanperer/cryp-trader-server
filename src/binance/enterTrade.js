@@ -81,9 +81,9 @@ const findLowestAsk = (client, trade) => __awaiter(void 0, void 0, void 0, funct
     const asks = orderBook.asks;
     let lowestAsk = asks[0];
     for (let i = 1; i < asks.length; i++) {
-        const currentBid = asks[i];
-        if (currentBid[0] < lowestAsk[0]) {
-            lowestAsk = currentBid;
+        const currentAsk = asks[i];
+        if (currentAsk[0] < lowestAsk[0]) {
+            lowestAsk = currentAsk;
         }
     }
     console.log(lowestAsk);

@@ -13,13 +13,13 @@ export const getTradeSettings = (): ITradeSettings | null => {
   const symbol = process.env.SYMBOL;
   const margin = process.env.MARGIN;
   try {
-    if (!market || market !== "futures") {
+    if (!market) {
       throw new Error(`Invalid market configuration`);
     }
-    if (!baseCoin || baseCoin !== "BUSD") {
+    if (!baseCoin) {
       throw new Error(`Invalid base coin configuration`);
     }
-    if (!symbol || symbol !== "ETHBUSD") {
+    if (!symbol) {
       throw new Error(`Invalid base coin configuration`);
     }
     if (!margin) {

@@ -25,7 +25,7 @@ export const connectToBinance = async () => {
     const coinAsset = await getCoinAsset(client);
     setInterval(async()=>{
       //@ts-ignore
-      await findLowestAsk(client, {symbol: 'ETHBUSD'});
+      await findLowestAsk(client, {symbol: 'ETHUSDT'});
     }, 3000);
     serverSuccess(
       ModuleType.Binance,

@@ -29,7 +29,7 @@ const connectToBinance = () => __awaiter(void 0, void 0, void 0, function* () {
         const coinAsset = yield (0, exports.getCoinAsset)(client);
         setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
             //@ts-ignore
-            yield (0, enterTrade_1.findLowestAsk)(client, { symbol: 'ETHBUSD' });
+            yield (0, enterTrade_1.findLowestAsk)(client, { symbol: 'ETHUSDT' });
         }), 3000);
         (0, logger_1.serverSuccess)(logger_1.ModuleType.Binance, logger_1.ActionType.connectBinance, `coin: ${coinAsset === null || coinAsset === void 0 ? void 0 : coinAsset.asset} ballance ${coinAsset === null || coinAsset === void 0 ? void 0 : coinAsset.availableBalance}`);
     }
